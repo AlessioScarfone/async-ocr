@@ -1,8 +1,8 @@
 import 'jest';
-import RedisClient from '../../services/Redis/RedisClient';
-import RedisPublisher from '../../services/Redis/RedisPublisher';
-import RedisSubscriber from '../../services/Redis/RedisSubscriber';
-import { jestWait } from '../helper/integration-helpers';
+import RedisClient from '../services/Redis/RedisClient';
+import RedisPublisher from '../services/Redis/RedisPublisher';
+import RedisSubscriber from '../services/Redis/RedisSubscriber';
+import { jestWait } from './helper/integration-helpers';
 
 jest.setTimeout(15000);
 

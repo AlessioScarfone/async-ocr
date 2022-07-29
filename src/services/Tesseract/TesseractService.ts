@@ -1,6 +1,7 @@
 import path from "path";
 import Tesseract from "tesseract.js";
 import IProcessor from "../../models/IProcessor";
+import { ACCEPTED_LANGUAGE } from "./TesseractTypes";
 
 const langPath = path.join(__dirname, 'lang')
 console.log("LANG LOCAL PATH:", langPath, "\n \n");
@@ -32,14 +33,19 @@ class TesseractProcessor implements IProcessor<TesseractProcessorInput, Tesserac
     private lang: string;
     private worker: Tesseract.Worker;
 
-    constructor(langPath: string, lang: string) {
-        this.langPath = langPath;
+    constructor(lang: string, langPath?: string) {
+        if (!ACCEPTED_LANGUAGE.includes(lang))
+            throw new Error("lang '" + lang + "' not supported")
+
+        this.langPath = langPath || path.join(__dirname, 'lang');
         this.lang = lang;
+        console.log("TesseractProcessor: constructor:", this.lang, this.langPath)
         this.worker = Tesseract.createWorker({ langPath: this.langPath });
     }
 
     public async init(): Promise<string> {
         try {
+            await this.worker.load();
             await this.worker.loadLanguage(this.lang);
             await this.worker.initialize(this.lang);
             return `TesseractProcessor: init END - lang [${this.lang}]`
