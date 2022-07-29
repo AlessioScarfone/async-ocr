@@ -1,9 +1,9 @@
 import 'jest'
-import TesseractProcessor from '../services/Tesseract/TesseractService'
+import TesseractProcessor from '../services/Tesseract/TesseractProcessor'
+jest.setTimeout(15000);
 
 describe('TesseractProcessor Client', () => {
     let processor: TesseractProcessor;
-    let initEsit = "";
     const testImg1 = {
         url: "https://tesseract.projectnaptha.com/img/eng_bw.png",
         result: 'Mild Splendour of the various-vested Night!\n' +
@@ -27,19 +27,10 @@ describe('TesseractProcessor Client', () => {
 
     beforeAll(async () => {
         processor = new TesseractProcessor('eng');
-        initEsit = await processor.init();
     });
-    afterAll(async () => {
-        await processor.destroy()
-    })
-
-    it("check InitEsit", () => {
-        expect(initEsit).toMatch(/^TesseractProcessor: init END - lang.*/)
-    })
 
     it("processs image by url (1)", async () => {
         const res = await processor.process({ imgUrl: testImg1.url });
-
         expect(res?.confidence).not.toBeNull();
         expect(res?.text).toEqual(testImg1.result);
     })
