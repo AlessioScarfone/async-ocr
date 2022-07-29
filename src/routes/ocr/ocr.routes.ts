@@ -32,7 +32,8 @@ ocrRouter.post(`${baseUrl}/recognize`,
                     lang: lang
                 }
             };
-            await redisPublisher.publish(redisMsg)
+            await redisPublisher.publish(redisMsg);
+            console.log("Publish on redis:", redisMsg);
             response.status(200).json({ id: requestID, ...request.body });
         } catch (err) {
             console.log("recognize route error: [" + requestID + "]: " + err)

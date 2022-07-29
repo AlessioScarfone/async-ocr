@@ -5,22 +5,27 @@ import RedisPublisher from "./services/Redis/RedisPublisher";
 import RedisSubscriber from "./services/Redis/RedisSubscriber";
 import { Server } from "http";
 import RedisRequestModel from "./models/RedisRequest.model";
+import TesseractProcessor, { TesseractProcessorInput } from "./services/Tesseract/TesseractProcessor";
 
 const app = createApp();
 
 const redisClient: RedisClient = RedisClient.getInstance();
 const redisPublisher = new RedisPublisher<RedisRequestModel>(redisClient.client, env.redis.channelPubSub);
 const redisSubscriber = new RedisSubscriber<RedisRequestModel>(redisClient.client, env.redis.channelPubSub);
-
+const tesseractProcessor_eng: TesseractProcessor = new TesseractProcessor('eng');
 Promise.all([
     redisClient.connect(),
     redisPublisher.connect(),
     redisSubscriber.connect(),
 ]).then(async () => {
-    //TODO: define ocr worker + write response on redis
     try {
-        await redisSubscriber.subscribe((msg: RedisRequestModel) => { 
-            console.log("subscribe msg handler", msg) 
+        await redisSubscriber.subscribe(async (msg: RedisRequestModel) => { 
+            const input: TesseractProcessorInput = {
+                imgUrl: msg.value.url
+            }
+            const res = await tesseractProcessor_eng.process(input)
+            await redisClient.writeMessage(msg.key, res);
+            console.log("Message Processsed: ", msg.key, input)
         })
     } catch (err) {
         throw new Error("Redis Subscription Error: " + err);

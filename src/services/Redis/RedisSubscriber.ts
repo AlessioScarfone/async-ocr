@@ -16,7 +16,7 @@ export default class RedisSubscriber<T> extends AbstractRedisServiceQueue {
         if (this.connected) {
             return this.subscriber.subscribe(this.channel, (message) => {
                 // console.log("Subscriber Read:", message)
-                handler(JSON.parse(message));
+                return handler(JSON.parse(message));
             })
         } else {
             return Promise.reject("Redis Subscriber not connected");
