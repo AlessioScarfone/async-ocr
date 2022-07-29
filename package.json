@@ -1,16 +1,17 @@
 {
-  "name": "ts-express-rest-api-template",
+  "name": "async-ocr",
   "version": "0.0.1",
-  "description": "Template project for REST API (TS + Express)",
+  "description": "Async OCR",
   "main": "server.js",
   "scripts": {
-    "start": "rm *traineddata && nodemon -r dotenv/config --watch src src/index.ts dotenv_config_path=.env",
+    "start": "rm -f *traineddata && nodemon -r dotenv/config --watch src src/index.ts dotenv_config_path=.env",
     "lint": "eslint src",
     "build": "rimraf dist && tsc --project tsconfig.build.json",
     "test": "jest --verbose=true",
     "test:watch": "jest --watch",
     "prestart-prod": "npm run build",
-    "start-prod": "node -r dotenv/config dist/index.js dotenv_config_path=.env.prod"
+    "start-prod": "node -r dotenv/config dist/index.js dotenv_config_path=.env.prod",
+    "redis": "docker run --name redis -d -p 6379:6379 redis redis-server --requirepass 'redispassword'"
   },
   "keywords": [
     "express",
@@ -33,6 +34,7 @@
     "@types/morgan": "^1.9.3",
     "@types/nanoid": "^3.0.0",
     "@types/node": "^18.0.6",
+    "@types/redis": "^4.0.11",
     "@types/supertest": "^2.0.12",
     "@types/tesseract.js": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
@@ -57,6 +59,7 @@
     "helmet": "^5.1.0",
     "morgan": "^1.10.0",
     "nanoid": "^3.3.4",
+    "redis": "^4.2.0",
     "tesseract.js": "^2.1.5"
   }
 }
