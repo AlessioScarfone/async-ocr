@@ -23,6 +23,9 @@ Promise.all([
         throw new Error("Redis Subscription Error: " + err);
     }
 
+    app.set("redisPublisher", redisPublisher);
+    app.set("redisClient", redisClient);
+
     //start server
     const server = app.listen(
         env.port,

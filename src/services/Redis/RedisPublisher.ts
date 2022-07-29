@@ -20,7 +20,7 @@ export default class RedisPublisher extends AbstractRedisServiceQueue {
 
     public async publish(message: any) {
         if (this.ready) {
-            return this.publisher.publish(this.channel, message);
+            return this.publisher.publish(this.channel, JSON.stringify(message));
         } else {
             return Promise.reject("Redis Publisher not ready");
         }

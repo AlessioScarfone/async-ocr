@@ -1,32 +1,43 @@
 import { Router, Request, Response } from "express";
-import { query, validationResult } from "express-validator";
-import { recognize } from "tesseract.js";
+import { body, validationResult } from "express-validator";
+import RedisRequestModel from "../../models/RedisRequest.model";
+import RedisPublisher from "../../services/Redis/RedisPublisher";
 import { ACCEPTED_LANGUAGE } from "../../services/Tesseract/TesseractTypes";
 
 const ocrRouter = Router();
 
 const baseUrl = "/api/ocr"
 
-ocrRouter.get(`${baseUrl}/recognize`,
-    query('url').isURL({ protocols: ['https', 'http'] }).withMessage('Invalid URL'),
-    query('lang').isString().isIn(ACCEPTED_LANGUAGE).withMessage('Invalid Lang'),
+ocrRouter.post(`${baseUrl}/recognize`,
+    body('url').isURL({ protocols: ['https', 'http'] }).withMessage('Invalid URL'),
+    body('lang').isString().isIn(ACCEPTED_LANGUAGE).withMessage('Invalid Lang'),
     async (request: Request, response: Response) => {
+        // ==== START: input validation ===
         const errors = validationResult(request);
+        const requestID = request.requestID;
         if (!errors.isEmpty()) {
-            console.log(`Error : [${request.requestID}]`, errors.array());
+            console.log(`Error : [${requestID}]`, errors.array());
             return response.status(400).json({ errors: errors.array() });
         }
+        // ==== END: input validation ===
 
-        const { url, lang } = request.query;
+        const { url, lang } = request.body;
 
-        const ocrResult = await recognize(url as string, lang as string);
-        const result = {
-            confidence: ocrResult?.data?.confidence,
-            text: ocrResult?.data?.text
+        const redisPublisher = request.app.get('redisPublisher') as RedisPublisher;
+        try {
+            const redisMsg: RedisRequestModel = {
+                key: requestID,
+                value: {
+                    url: url,
+                    lang: lang
+                }
+            };
+            await redisPublisher.publish(redisMsg)
+            response.status(200).json({ id: requestID, ...request.body });
+        } catch (err) {
+            console.log("recognize route error: [" + requestID + "]: " + err)
+            response.status(500).json({ error: 'Generic Error' });
         }
-
-        console.log(`recognize [${request.requestID}] result:`, result)
-        response.status(200).json(result);
     })
 
 export default ocrRouter;
