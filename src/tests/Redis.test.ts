@@ -8,8 +8,8 @@ jest.setTimeout(15000);
 
 describe('Redis Client', () => {
     let redisClient: RedisClient;
-    let redisPublisher: RedisPublisher;
-    let redisSubscriber: RedisSubscriber;
+    let redisPublisher: RedisPublisher<string>;
+    let redisSubscriber: RedisSubscriber<string>;
     const channel = "jest_test";
     const subscribedMsg: string[] = [];
 

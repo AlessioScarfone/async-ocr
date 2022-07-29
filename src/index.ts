@@ -4,12 +4,13 @@ import RedisClient from "./services/Redis/RedisClient";
 import RedisPublisher from "./services/Redis/RedisPublisher";
 import RedisSubscriber from "./services/Redis/RedisSubscriber";
 import { Server } from "http";
+import RedisRequestModel from "./models/RedisRequest.model";
 
 const app = createApp();
 
 const redisClient: RedisClient = RedisClient.getInstance();
-const redisPublisher = new RedisPublisher(redisClient.client, env.redis.channelPubSub);
-const redisSubscriber = new RedisSubscriber(redisClient.client, env.redis.channelPubSub);
+const redisPublisher = new RedisPublisher<RedisRequestModel>(redisClient.client, env.redis.channelPubSub);
+const redisSubscriber = new RedisSubscriber<RedisRequestModel>(redisClient.client, env.redis.channelPubSub);
 
 Promise.all([
     redisClient.connect(),
@@ -18,7 +19,9 @@ Promise.all([
 ]).then(async () => {
     //TODO: define ocr worker + write response on redis
     try {
-        await redisSubscriber.subscribe((msg: string) => { console.log("subscribe msg handler", msg) })
+        await redisSubscriber.subscribe((msg: RedisRequestModel) => { 
+            console.log("subscribe msg handler", msg) 
+        })
     } catch (err) {
         throw new Error("Redis Subscription Error: " + err);
     }

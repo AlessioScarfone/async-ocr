@@ -23,7 +23,7 @@ ocrRouter.post(`${baseUrl}/recognize`,
 
         const { url, lang } = request.body;
 
-        const redisPublisher = request.app.get('redisPublisher') as RedisPublisher;
+        const redisPublisher = request.app.get('redisPublisher') as RedisPublisher<RedisRequestModel>;
         try {
             const redisMsg: RedisRequestModel = {
                 key: requestID,

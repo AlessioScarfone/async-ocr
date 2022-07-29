@@ -1,7 +1,7 @@
 import { CreateRedisClientType } from "./AbstractRedisService";
 import AbstractRedisServiceQueue from "./AbstractRedisServiceQueue";
 
-export default class RedisSubscriber extends AbstractRedisServiceQueue {
+export default class RedisSubscriber<T> extends AbstractRedisServiceQueue {
     private subscriber: CreateRedisClientType;
 
     constructor(client: CreateRedisClientType, channel: string) {
@@ -12,11 +12,11 @@ export default class RedisSubscriber extends AbstractRedisServiceQueue {
     }
 
     //** Call after connect */
-    public async subscribe(handler: (msg: string) => void): Promise<void> {
+    public async subscribe(handler: (obj: T) => void): Promise<void> {
         if (this.connected) {
             return this.subscriber.subscribe(this.channel, (message) => {
                 // console.log("Subscriber Read:", message)
-                handler(message);
+                handler(JSON.parse(message));
             })
         } else {
             return Promise.reject("Redis Subscriber not connected");

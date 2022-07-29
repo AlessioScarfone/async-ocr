@@ -1,7 +1,7 @@
 import { CreateRedisClientType } from "./AbstractRedisService";
 import AbstractRedisServiceQueue from "./AbstractRedisServiceQueue";
 
-export default class RedisPublisher extends AbstractRedisServiceQueue {
+export default class RedisPublisher<T> extends AbstractRedisServiceQueue {
     private publisher: CreateRedisClientType;
 
     constructor(client: CreateRedisClientType, channel: string) {
@@ -18,7 +18,7 @@ export default class RedisPublisher extends AbstractRedisServiceQueue {
         return this.publisher.disconnect();
     }
 
-    public async publish(message: any) {
+    public async publish(message: T) {
         if (this.ready) {
             return this.publisher.publish(this.channel, JSON.stringify(message));
         } else {
