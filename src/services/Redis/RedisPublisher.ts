@@ -22,7 +22,7 @@ export default class RedisPublisher extends AbstractRedisServiceQueue {
         if (this.ready) {
             return this.publisher.publish(this.channel, message);
         } else {
-            throw new Error("Redis Publisher not ready");
+            return Promise.reject("Redis Publisher not ready");
         }
     }
 }

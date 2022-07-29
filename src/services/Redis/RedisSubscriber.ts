@@ -11,24 +11,24 @@ export default class RedisSubscriber extends AbstractRedisServiceQueue {
         this.initEventListener(this.client, "client")
     }
 
-    protected async disconnectMethod(): Promise<void> {
-        return this.subscriber.disconnect();
-    }
-
     //** Call after connect */
     public async subscribe(handler: (msg: string) => void): Promise<void> {
         if (this.connected) {
             return this.subscriber.subscribe(this.channel, (message) => {
-                console.log("Subscriber Read:", message)
+                // console.log("Subscriber Read:", message)
                 handler(message);
             })
         } else {
-            throw new Error("Subscriber client not connected");
+            return Promise.reject("Redis Subscriber not connected");
         }
     }
 
+    protected async disconnectMethod(): Promise<void> {
+        return this.subscriber.disconnect();
+    }
+
     public async unsubscribe(): Promise<void> {
-        this.subscriber.unsubscribe()
+        return this.subscriber.unsubscribe()
     }
 
     public async connect(): Promise<void> {

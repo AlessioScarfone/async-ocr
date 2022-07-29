@@ -28,16 +28,22 @@ export default class RedisClient extends AbstractRedisService {
         return this.client.ping();
     }
 
-    public async writeMessage(key: string, message: any) {
+    public async writeMessage(key: string, message: any): Promise<string | null> {
         if (this.ready) {
             return this.client.set(key, JSON.stringify(message), {
                 EX: env.redis.expiracy,
                 NX: true
             })
-                .then(d => { console.log("Write OK:", d) })
-                .catch(e => { console.log("Write KO:", e) })
         } else {
-            throw new Error("Redis Client not ready");
+            return Promise.reject("Redis Client not ready");
+        }
+    }
+
+    public async readMessage(key: string): Promise<string | null> {
+        if (this.ready) {
+            return this.client.get(key)
+        } else {
+            return Promise.reject("Redis Client not ready");
         }
     }
 

@@ -42,7 +42,7 @@ export default abstract class AbstractRedisService {
             return this.disconnectMethod();
         else {
             console.log("Already Disconnected")
-            return new Promise(() => { Promise.resolve() })
+            return Promise.resolve();
         }
     }
 

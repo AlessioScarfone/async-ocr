@@ -14,3 +14,5 @@ export default class BootstrapHelpers {
         return this.appInstance;
     }
 }
+
+export const jestWait = (timer: number) => { return new Promise((r) => setTimeout(r, timer)) };
