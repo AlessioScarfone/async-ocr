@@ -40,7 +40,7 @@ ocrRouter.post(`${baseUrl}/recognition`,
                 }
             };
             await redisPublisher.publish(redisMsg);
-            console.log("Publish on redis:", redisMsg);
+            // console.log("Publish on redis:", redisMsg);
             response.status(200).json({ id: requestID, ...request.body });
         } catch (err) {
             console.log("recognize POST error: [" + requestID + "]: " + err)

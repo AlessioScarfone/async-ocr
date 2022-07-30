@@ -29,16 +29,26 @@ describe('TesseractProcessor Client', () => {
         processor = new TesseractProcessor('eng');
     });
 
-    it("processs image by url (1)", async () => {
+    it("process image by url (1)", async () => {
         const res = await processor.process({ imgUrl: testImg1.url });
         expect(res?.confidence).not.toBeNull();
         expect(res?.text).toEqual(testImg1.result);
     })
 
-    it("processs image by url (2)", async () => {
+    it("process image by url (2)", async () => {
         const res = await processor.process({ imgUrl: testImg2.url });
         expect(res?.confidence).not.toBeNull();
         expect(res?.text).toEqual(testImg2.result);
+    })
+
+    it("Multiple process image by url (1) - 10 iterations", async () => {
+        const iterations = 10;
+        for (let i = 0; i < iterations; i++) {
+            const res = await processor.process({ imgUrl: testImg1.url });
+            expect(res?.confidence).not.toBeNull();
+            expect(res?.text).toEqual(testImg1.result);
+            console.log("Done: " + i + "/" + iterations )
+        }
     })
 
 })
