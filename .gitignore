@@ -43,3 +43,7 @@ Thumbs.db
 
 # unzipped traineddata
 /*.traineddata
+
+
+# log file
+log*

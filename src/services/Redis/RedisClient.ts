@@ -13,7 +13,7 @@ export default class RedisClient extends AbstractRedisService {
             username: env.redis.user,
         });
         this.init(client);
-        this.initEventListener(this.client, "client")
+        this.initEventListener(this.client, "Client")
     }
 
     protected async disconnectMethod(): Promise<void> {

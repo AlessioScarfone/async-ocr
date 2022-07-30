@@ -8,7 +8,7 @@ export default class RedisSubscriber<T> extends AbstractRedisServiceQueue {
         super(client, channel);
         this.subscriber = this.client.duplicate();
 
-        this.initEventListener(this.client, "client")
+        this.initEventListener(this.client, "Subscriber-"+this.channel)
     }
 
     //** Call after connect */

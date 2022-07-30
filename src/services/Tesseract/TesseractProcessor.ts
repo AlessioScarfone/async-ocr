@@ -66,7 +66,7 @@ class TesseractProcessor implements IProcessor<TesseractProcessorInput, Tesserac
                 confidence: ocrResult?.data?.confidence,
                 text: ocrResult?.data?.text
             }
-            await this.destroy()
+            await this.destroy();
             return result;
         } else {
             throw new Error("imgUrl not found");

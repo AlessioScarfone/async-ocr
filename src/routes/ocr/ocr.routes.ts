@@ -51,7 +51,7 @@ ocrRouter.post(`${baseUrl}/recognition`,
 /**
  * Retrieve OCR result
  */
-ocrRouter.get(`${baseUrl}/recognition`,
+ocrRouter.get(`${baseUrl}/recognition/result`,
     query('id').exists().isString().notEmpty().withMessage('Invalid requestId'),
     async (request: Request, response: Response) => {
         // ==== START: input validation ===

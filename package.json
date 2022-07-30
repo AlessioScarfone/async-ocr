@@ -11,7 +11,8 @@
     "test:watch": "jest --watch",
     "prestart-prod": "npm run build",
     "start-prod": "node -r dotenv/config dist/index.js dotenv_config_path=.env.prod",
-    "redis": "docker run --name redis -d -p 6379:6379 redis redis-server --requirepass 'redispassword'"
+    "redis": "docker run --name redis -d -p 6379:6379 redis redis-server --requirepass 'redispassword'",
+    "start-with-logfile": "npm run start  > log.txt 2>log_err.txt"
   },
   "keywords": [
     "express",

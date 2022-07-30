@@ -13,6 +13,7 @@ const redisClient: RedisClient = RedisClient.getInstance();
 const redisPublisher = new RedisPublisher<RedisRequestModel>(redisClient.client, env.redis.channelPubSub);
 const redisSubscriber = new RedisSubscriber<RedisRequestModel>(redisClient.client, env.redis.channelPubSub);
 const tesseractProcessor_eng: TesseractProcessor = new TesseractProcessor('eng');
+
 Promise.all([
     redisClient.connect(),
     redisPublisher.connect(),
