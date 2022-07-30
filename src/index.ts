@@ -24,9 +24,10 @@ Promise.all([
             const input: TesseractProcessorInput = {
                 imgUrl: msg.value.url
             }
+            console.log("Message: ", msg.key, input)
             const res = await tesseractProcessor_eng.process(input)
             await redisClient.writeMessage(msg.key, res);
-            console.log("Message Processsed: ", msg.key, input)
+            console.log("Message Processed: ", msg.key)
         })
     } catch (err) {
         throw new Error("Redis Subscription Error: " + err);

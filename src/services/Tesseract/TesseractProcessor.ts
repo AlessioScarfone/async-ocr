@@ -60,13 +60,24 @@ class TesseractProcessor implements IProcessor<TesseractProcessorInput, Tesserac
 
     public async process(input: TesseractProcessorInput) {
         if (input.imgUrl) {
-            await this.init();
-            const ocrResult = await this.worker.recognize(input?.imgUrl);
+            // await this.init();
+            // const ocrResult = await this.worker.recognize(input?.imgUrl);
+            // const result: TesseractProcessorOutput = {
+            //     confidence: ocrResult?.data?.confidence,
+            //     text: ocrResult?.data?.text
+            // }
+            // await this.destroy();
+            // return result;
+
+            // V2
+            const ocrResult = await Tesseract.recognize(input?.imgUrl, this.lang, {
+                gzip: true, langPath: this.langPath
+            });
             const result: TesseractProcessorOutput = {
                 confidence: ocrResult?.data?.confidence,
                 text: ocrResult?.data?.text
             }
-            await this.destroy();
+            // await this.destroy();
             return result;
         } else {
             throw new Error("imgUrl not found");
