@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "npm run clear && nodemon -r dotenv/config --watch src src/index.ts dotenv_config_path=.env",
-    "start:log": "npm run start > log.txt 2> log_err.txt",
+    "start:log": "npm run start 2>&1| tee log.txt",
     "prestart-prod": "npm run clear && npm run build",
     "start-prod": "npm run clear && node -r dotenv/config dist/index.js dotenv_config_path=.env.prod",
     "test": "jest --verbose=true --runInBand --detectOpenHandles --forceExit",
