@@ -21,8 +21,7 @@ export default class RedisQueueWorker {
 
         this.worker.on("message", function (msg, next, id) {
             // process your message
-            console.log("Message id : " + id);
-            console.log(msg);
+            console.log("RQW - OnMessage: " + id, msg);
             onMessageCallback(msg);
             next()
         });
@@ -37,7 +36,7 @@ export default class RedisQueueWorker {
         });
 
         this.worker.on('timeout', function (msg) {
-            console.log("TIMEOUT", msg.id, msg.rc);
+            console.log("TIMEOUT", msg.id, msg?.rc);
         });
 
         this.worker.start();

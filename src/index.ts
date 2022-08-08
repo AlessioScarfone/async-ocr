@@ -30,13 +30,13 @@ Promise.all([
 
         new RedisQueueWorker(RECOGNIZE_QUEUE_ENG,
             async (msg: any) => {
+                console.log("RQW - Message: ", msg);
                 const parsedMsg = JSON.parse(msg) as RedisRequestModel;
-                console.log("RQW - Message: ", parsedMsg)
                 
                 const input: TesseractProcessorInput = {
                     ...parsedMsg.value
                 }
-                console.log("TesseractProcessorInput:", input);
+                // console.log("TesseractProcessorInput:", input);
                 const tesseractOutput = await tesseractProcessor_eng.process(input);
                 await redisClient.writeMessage(parsedMsg.key, tesseractOutput);
                 console.log("RQW - Message Processed: ", parsedMsg.key, tesseractOutput)
