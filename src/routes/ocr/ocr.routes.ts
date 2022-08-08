@@ -1,8 +1,11 @@
 import { Router, Request, Response } from "express";
 import { body, query, validationResult } from "express-validator";
+import { EXPRESS_CONTEXT_KEY } from "../../app";
+import env from "../../config/env";
 import RedisRequestModel from "../../models/RedisRequest.model";
 import RedisClient from "../../services/Redis/RedisClient";
-import RedisPublisher from "../../services/Redis/RedisPublisher";
+// import RedisPublisher from "../../services/Redis/RedisPublisher";
+import RedisQueueManger from "../../services/Redis/RedisQueueManager";
 import { ACCEPTED_LANGUAGE } from "../../services/Tesseract/TesseractTypes";
 
 const NOT_FOUND_ERROR = "NOT FOUND";
@@ -30,7 +33,7 @@ ocrRouter.post(`${baseUrl}/recognition`,
 
         const { url, lang } = request.body;
 
-        const redisPublisher = request.app.get('redisPublisher') as RedisPublisher<RedisRequestModel>;
+        const redisQueueWriter = request.app.get(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER) as RedisQueueManger;
         try {
             const redisMsg: RedisRequestModel = {
                 key: requestID,
@@ -39,7 +42,7 @@ ocrRouter.post(`${baseUrl}/recognition`,
                     lang: lang
                 }
             };
-            await redisPublisher.publish(redisMsg);
+            await redisQueueWriter.rsmq.sendMessageAsync({ qname: env.redis.queuePrefix + lang, message: JSON.stringify(redisMsg) });
             // console.log("Publish on redis:", redisMsg);
             response.status(200).json({ id: requestID, ...request.body });
         } catch (err) {
@@ -66,7 +69,7 @@ ocrRouter.get(`${baseUrl}/recognition/result`,
         const id = request.query?.id as string;
 
         try {
-            const redisClient = request.app.get('redisClient') as RedisClient;
+            const redisClient = request.app.get(EXPRESS_CONTEXT_KEY.REDIS_CLIENT) as RedisClient;
             let record = await redisClient.readMessage(id);
             //TODO: cancella i record o lasciali scadere ?? 
             record = record ? JSON.parse(record) : NOT_FOUND_ERROR;

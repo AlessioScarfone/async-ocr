@@ -30,10 +30,15 @@ export default class RedisClient extends AbstractRedisService {
 
     public async writeMessage(key: string, message: any): Promise<string | null> {
         if (this.ready) {
-            return this.client.set(key, JSON.stringify(message), {
-                EX: env.redis.expiracy,
-                NX: true
-            })
+            // console.log("Redis Write message", key, message);
+            if(key) {
+                return this.client.set(key, JSON.stringify(message), {
+                    EX: env.redis.expiracy,
+                    NX: true
+                })
+            } else {
+                return Promise.reject(`Redis Client writeMessage - key is missing. msg [ ${message} ]`);  
+            }
         } else {
             return Promise.reject("Redis Client not ready");
         }

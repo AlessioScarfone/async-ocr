@@ -21,7 +21,8 @@ import { ACCEPTED_LANGUAGE } from "./TesseractTypes";
 // }
 
 type TesseractProcessorInput = {
-    imgUrl: string;
+    url: string;
+    lang: string;
 }
 type TesseractProcessorOutput = {
     confidence: number;
@@ -59,7 +60,7 @@ class TesseractProcessor implements IProcessor<TesseractProcessorInput, Tesserac
     }
 
     public async process(input: TesseractProcessorInput) {
-        if (input.imgUrl) {
+        if (input.url) {
             // await this.init();
             // const ocrResult = await this.worker.recognize(input?.imgUrl);
             // const result: TesseractProcessorOutput = {
@@ -70,17 +71,16 @@ class TesseractProcessor implements IProcessor<TesseractProcessorInput, Tesserac
             // return result;
 
             // V2
-            const ocrResult = await Tesseract.recognize(input?.imgUrl, this.lang, {
+            const ocrResult = await Tesseract.recognize(input?.url, this.lang, {
                 gzip: true, langPath: this.langPath
             });
             const result: TesseractProcessorOutput = {
                 confidence: ocrResult?.data?.confidence,
                 text: ocrResult?.data?.text
             }
-            // await this.destroy();
             return result;
         } else {
-            throw new Error("imgUrl not found");
+            throw new Error("img 'url' not found");
         }
     }
 

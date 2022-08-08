@@ -33,7 +33,7 @@ const env = {
         user: process.env.REDIS_USERNAME,
         port: process.env.REDIS_PORT || "6379",
         host: process.env.REDIS_HOST || "127.0.0.1",
-        channelPubSub: process.env.REDIS_CHANNEL_PUB_SUB || "results",
+        queuePrefix: process.env.REDIS_QUEUE_RECOGNIZE || "recognize_",
         expiracy: toNumber(process.env.REDIS_EXPIRACY || "21600") 
     }
 }
