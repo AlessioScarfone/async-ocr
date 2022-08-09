@@ -5,27 +5,24 @@ import RedisClient from "./services/Redis/RedisClient";
 import RedisBullQueueManger from "./services/Redis/RedisBullQueueManager";
 import tesseractProcessorFactory from "./services/Tesseract/TesseractProcessor";
 
-const app = createApp();
+const RECOGNIZE_QUEUE_ENG = env.redis.queuePrefix + "eng";
 
 const redisClient: RedisClient = RedisClient.getInstance();
-const RECOGNIZE_QUEUE_ENG = env.redis.queuePrefix + "eng";
-const bullQueueManger = new RedisBullQueueManger();
+const bullQueueManger = RedisBullQueueManger.getInstance();
+
+bullQueueManger.createQueue(RECOGNIZE_QUEUE_ENG);
+
+const app = createApp();
 
 Promise.all([
     redisClient.connect(),
 ]).then(async () => {
-    try {
-        bullQueueManger.createQueue(RECOGNIZE_QUEUE_ENG);
-        // bullQueueManger.addProcessorOnQueue(RECOGNIZE_QUEUE_ENG,  (j,done) => {console.log("process", j.data); done()})
 
-        bullQueueManger.addProcessorOnQueue(
-            RECOGNIZE_QUEUE_ENG,
-            tesseractProcessorFactory('eng', redisClient)
-        )
-
-    } catch (err) {
-        throw new Error("Redis Subscription Error: " + err);
-    }
+    // bullQueueManger.addProcessorOnQueue(RECOGNIZE_QUEUE_ENG,  (j,done) => {console.log("process", j.data); done()})
+    bullQueueManger.addProcessorOnQueue(
+        RECOGNIZE_QUEUE_ENG,
+        tesseractProcessorFactory('eng', redisClient)
+    )
 
     app.set(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER, bullQueueManger);
     app.set(EXPRESS_CONTEXT_KEY.REDIS_CLIENT, redisClient);
@@ -46,7 +43,6 @@ Promise.all([
 });
 
 
-
 const addSIGTERMListener = (server: Server) => {
     process.on('SIGTERM', () => {
         console.log('SIGTERM signal received: closing HTTP server');
@@ -55,8 +51,9 @@ const addSIGTERMListener = (server: Server) => {
 
             Promise.all([
                 redisClient.disconnect(),
+                bullQueueManger.disconnect(),
             ]).then(() => {
-                //
+                console.log("SIGTERM END")
             }).catch(err => {
                 console.log("SIGTERM ERROR 1:", err);
                 process.exit(1);
@@ -64,11 +61,5 @@ const addSIGTERMListener = (server: Server) => {
         })
     })
 }
-
-
-
-
-
-
 
 

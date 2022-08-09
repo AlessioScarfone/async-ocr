@@ -22,12 +22,6 @@ function toNumber(value: string): number {
 const env = {
     node_env: process.env.NODE_ENV || "production",
     port: process.env.PORT || 8080,
-    monitor: {
-        enabled: toBool(process.env.MONITOR_ENABLED),
-        page: process.env.MONITOR_ROUTE,
-        user: process.env.MONITOR_USERNAME,
-        password: process.env.MONITOR_PASSWORD
-    },
     redis: {
         password: process.env.REDIS_PASSWORD,
         user: process.env.REDIS_USERNAME,
@@ -35,6 +29,18 @@ const env = {
         host: process.env.REDIS_HOST || "127.0.0.1",
         queuePrefix: process.env.REDIS_QUEUE_RECOGNIZE || "recognize_",
         expiracy: toNumber(process.env.REDIS_EXPIRACY || "21600") 
+    },
+    monitor: {
+        enabled: toBool(process.env.MONITOR_ENABLED),
+        page: process.env.MONITOR_ROUTE,
+        user: process.env.MONITOR_USERNAME,
+        password: process.env.MONITOR_PASSWORD,
+    },
+    bullMonitor: {
+        enabled: toBool(process.env.BULL_MONITOR_ENABLED),
+        page: process.env.BULL_MONITOR_ROUTE,
+        user: process.env.BULL_MONITOR_USERNAME,
+        password: process.env.BULL_MONITOR_PASSWORD,
     }
 }
 

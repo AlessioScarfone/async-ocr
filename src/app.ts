@@ -5,9 +5,11 @@ import morgan from "morgan";
 import { errorHandlerMiddleware } from "./middlewares/error-handler.middleware";
 import * as Routers from "./routes";
 import requestIDMiddleware from "./middlewares/request-id.middleware";
-import env from "./config/env";
 import loadMonitorPage from "./loaders/loadMonitorPage";
 import loadHelmetMiddleware from "./loaders/loadHelmetMiddleware";
+import loadBullMonitorPage from "./loaders/loadBullMonitorPage";
+
+let bullMonitorConfiguredEsit = false;
 
 const EXPRESS_CONTEXT_KEY = {
   REDIS_CLIENT: "redisClient",
@@ -15,11 +17,9 @@ const EXPRESS_CONTEXT_KEY = {
 }
 
 const loadExpressMiddleware = (app: Express) => {
-  if (env.monitor.enabled && env.monitor.user && env.monitor.page && env.monitor.password)
-    loadMonitorPage(app)
-  else
-    console.log(">> Monitor not configured <<")
-
+  loadMonitorPage(app)
+  bullMonitorConfiguredEsit = loadBullMonitorPage(app)
+  
   loadHelmetMiddleware(app);
   app.use(cors());
   app.use(requestIDMiddleware());
@@ -36,7 +36,7 @@ const loadExpressMiddleware = (app: Express) => {
 }
 
 const logRegisteredRoutes = (app: Express) => {
-  console.log("== Registered Routes ==")
+  console.log("\n========= Registered Routes =========")
   const routes = app._router.stack.map((middleware: any) => {
     if (middleware.route)
       return { path: middleware?.route?.path, methods: middleware?.route?.methods }
@@ -48,8 +48,11 @@ const logRegisteredRoutes = (app: Express) => {
     }
   }).flat(Infinity).filter((e: any) => e)
 
+  if(bullMonitorConfiguredEsit) {
+    routes.push({ path: '/admin/status/bull', methods: { get: true } })
+  }
   console.log(routes);
-  console.log("=======================")
+  console.log("=====================================\n")
 }
 
 

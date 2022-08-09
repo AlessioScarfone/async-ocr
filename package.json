@@ -1,6 +1,6 @@
 {
   "name": "async-ocr",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Async OCR",
   "main": "server.js",
   "scripts": {
@@ -17,10 +17,11 @@
   "keywords": [
     "express",
     "typescript",
-    "template",
     "rest",
+    "redis",
+    "bull",
     "api",
-    "boilerplate"
+    "ocr"
   ],
   "author": "Alessio Scarfone",
   "license": "MIT",
@@ -52,6 +53,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
+    "@bull-board/express": "^4.2.2",
     "bull": "^4.8.5",
     "compression": "^1.7.4",
     "cors": "^2.8.5",

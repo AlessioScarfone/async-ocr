@@ -43,7 +43,7 @@ describe('TesseractProcessor Client', () => {
         expect(res?.text).toEqual(testImg2.result);
     })
 
-    it("Multiple process image by url (1) - 10 iterations", async () => {
+    it.skip("Multiple process image by url (1) - 10 iterations", async () => {
         const iterations = 10;
         for (let i = 0; i < iterations; i++) {
             const res = await processor.process({ url: testImg1.url, lang: 'eng' });
