@@ -5,7 +5,7 @@ import monitor from 'express-status-monitor';
 import monitorConfig from "../config/monitor.config";
 import expressBasicAuth from "express-basic-auth";
 
-const loadMonitorPage = (app: Express) => {
+const loadMonitorPage = (app: Express): boolean => {
     if (env.monitor.enabled && env.monitor.user && env.monitor.page && env.monitor.password) {
         const statusMonitor = monitor(monitorConfig([
             {
@@ -31,8 +31,10 @@ const loadMonitorPage = (app: Express) => {
         // app.use(monitor(monitorConfig(PORT, '/status')));
 
         console.log(">> Monitor configured <<")
+        return true;
     } else {
         console.log(">> Monitor not configured <<")
+        return false;
     }
 }
 

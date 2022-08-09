@@ -5,11 +5,11 @@ import morgan from "morgan";
 import { errorHandlerMiddleware } from "./middlewares/error-handler.middleware";
 import * as Routers from "./routes";
 import requestIDMiddleware from "./middlewares/request-id.middleware";
-import env from "./config/env";
 import loadMonitorPage from "./loaders/loadMonitorPage";
 import loadHelmetMiddleware from "./loaders/loadHelmetMiddleware";
 import loadBullMonitorPage from "./loaders/loadBullMonitorPage";
-import RedisBullQueueManger from "./services/Redis/RedisBullQueueManager";
+
+let bullMonitorConfiguredEsit = false;
 
 const EXPRESS_CONTEXT_KEY = {
   REDIS_CLIENT: "redisClient",
@@ -18,7 +18,7 @@ const EXPRESS_CONTEXT_KEY = {
 
 const loadExpressMiddleware = (app: Express) => {
   loadMonitorPage(app)
-  loadBullMonitorPage(app)
+  bullMonitorConfiguredEsit = loadBullMonitorPage(app)
   
   loadHelmetMiddleware(app);
   app.use(cors());
@@ -48,6 +48,9 @@ const logRegisteredRoutes = (app: Express) => {
     }
   }).flat(Infinity).filter((e: any) => e)
 
+  if(bullMonitorConfiguredEsit) {
+    routes.push({ path: '/admin/status/bull', methods: { get: true } })
+  }
   console.log(routes);
   console.log("=====================================\n")
 }

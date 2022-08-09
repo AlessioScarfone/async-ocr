@@ -7,7 +7,7 @@ import expressBasicAuth from "express-basic-auth";
 import { nanoid } from "nanoid";
 import RedisBullQueueManger from "../services/Redis/RedisBullQueueManager";
 
-const loadBullMonitorPage = (app: Express) => {
+const loadBullMonitorPage = (app: Express): boolean => {
     if (env.bullMonitor.enabled && env.bullMonitor.page && env.bullMonitor.user && env.bullMonitor.password) {
         const serverAdapter = new ExpressAdapter();
         serverAdapter.setBasePath(env.bullMonitor.page);
@@ -32,8 +32,10 @@ const loadBullMonitorPage = (app: Express) => {
             realm: nanoid()
         }), serverAdapter.getRouter());
         console.log(">> Bull Monitor configured <<")
+        return true;
     } else {
         console.log(">> Bull Monitor not configured <<")
+        return false;
     }
 }
 
