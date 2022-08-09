@@ -2,61 +2,47 @@ import { Server } from "http";
 import env from "./config/env";
 import createApp, { EXPRESS_CONTEXT_KEY } from "./app";
 import RedisClient from "./services/Redis/RedisClient";
-// import RedisPublisher from "./services/Redis/RedisPublisher";
-// import RedisSubscriber from "./services/Redis/RedisSubscriber";
-// import RedisRequestModel from "./models/RedisRequest.model";
-import TesseractProcessor, { TesseractProcessorInput } from "./services/Tesseract/TesseractProcessor";
-import RedisQueueManger from "./services/Redis/RedisQueueManager";
-import RedisQueueWorker from "./services/Redis/RedisQueueWorker";
+import TesseractWorker, { TesseractWorkerInput, TesseractWorkerOutput } from "./services/Tesseract/TesseractWorker";
 import RedisRequestModel from "./models/RedisRequest.model";
+import RedisBullQueueManger from "./services/Redis/RedisBullQueueManager";
+import { Job } from "bull";
 
 const app = createApp();
 
 const redisClient: RedisClient = RedisClient.getInstance();
-// const redisPublisher = new RedisPublisher<RedisRequestModel>(redisClient.client, env.redis.channelPubSub);
-// const redisSubscriber = new RedisSubscriber<RedisRequestModel>(redisClient.client, env.redis.channelPubSub);
-const tesseractProcessor_eng: TesseractProcessor = new TesseractProcessor('eng');
-const rqm: RedisQueueManger = new RedisQueueManger();
+const tesseractWorker_eng: TesseractWorker = new TesseractWorker('eng');
 const RECOGNIZE_QUEUE_ENG = env.redis.queuePrefix + "eng";
-
+const bullQueueManger = new RedisBullQueueManger();
 
 Promise.all([
     redisClient.connect(),
-    // redisPublisher.connect(),
-    // redisSubscriber.connect(),
 ]).then(async () => {
     try {
-        await rqm.createQueue(RECOGNIZE_QUEUE_ENG);
+        bullQueueManger.createQueue(RECOGNIZE_QUEUE_ENG);
+        // bullQueueManger.addProcessorOnQueue(RECOGNIZE_QUEUE_ENG,  (j,done) => {console.log("process", j.data); done()})
 
-        new RedisQueueWorker(RECOGNIZE_QUEUE_ENG,
-            async (msg: any) => {
-                // console.log("RQW - Message: ", msg);
-                const parsedMsg = JSON.parse(msg) as RedisRequestModel;
-                
-                const input: TesseractProcessorInput = {
-                    ...parsedMsg.value
+        bullQueueManger.addProcessorOnQueue(RECOGNIZE_QUEUE_ENG,
+            async (job: Job) => {
+                console.log("START JOB PROCESSOR", job?.id);
+                const msg = job?.data as RedisRequestModel;
+                console.log(`Process job [${job?.id}] - Message: `, msg);
+
+                const input: TesseractWorkerInput = {
+                    ...msg.value
                 }
                 // console.log("TesseractProcessorInput:", input);
-                const tesseractOutput = await tesseractProcessor_eng.process(input);
-                await redisClient.writeMessage(parsedMsg.key, tesseractOutput);
-                console.log("RQW - Message Processed: ", parsedMsg.key, tesseractOutput)
+                const tesseractOutput: TesseractWorkerOutput = await tesseractWorker_eng.process(input);
+                console.log(`Process job [${job?.id}] - Result`, msg.key, tesseractOutput)
+                await redisClient.writeMessage(msg.key, tesseractOutput);
+                return Promise.resolve();
             }
         )
 
-        // await redisSubscriber.subscribe(async (msg: RedisRequestModel) => { 
-        //     const input: TesseractProcessorInput = {
-        //         imgUrl: msg.value.url
-        //     }
-        //     console.log("Message: ", msg.key, input)
-        //     const res = await tesseractProcessor_eng.process(input)
-        //     await redisClient.writeMessage(msg.key, res);
-        //     console.log("Message Processed: ", msg.key)
-        // })
     } catch (err) {
         throw new Error("Redis Subscription Error: " + err);
     }
 
-    app.set(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER, rqm);
+    app.set(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER, bullQueueManger);
     app.set(EXPRESS_CONTEXT_KEY.REDIS_CLIENT, redisClient);
 
     //start server
@@ -64,7 +50,7 @@ Promise.all([
         env.port,
         () => {
             console.log(`🚀 Server ready at http://localhost:${env.port}`);
-            console.log(`🗒 Node Env: ${env.node_env}`)
+            console.log(`🗒 Node Env: ${env.node_env} \n`)
         }
     );
 
@@ -84,16 +70,8 @@ const addSIGTERMListener = (server: Server) => {
 
             Promise.all([
                 redisClient.disconnect(),
-                rqm.disconnect()
-                // redisPublisher.disconnect(),
-                // redisSubscriber.unsubscribe()
             ]).then(() => {
-                // redisSubscriber.disconnect().then(() => {
-                //     process.exit(0);
-                // }).catch(err => {
-                //     console.log("SIGTERM ERROR 2:", err);
-                //     process.exit(1);
-                // })
+                //
             }).catch(err => {
                 console.log("SIGTERM ERROR 1:", err);
                 process.exit(1);
@@ -101,6 +79,7 @@ const addSIGTERMListener = (server: Server) => {
         })
     })
 }
+
 
 
 

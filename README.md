@@ -16,7 +16,10 @@ TODO
 
 ### Redis utils command
 
-- **List all queue:** <br/> `smembers rsmq:QUEUES`
+[Redis Cheatsheet](https://quickref.me/redis)
+
+- **Connect to Redis:** <br/> `redis-cli`
+- **Login:** <br/> `AUTH [password]`
 - **Clean all data:** <br/> `FLUSHDB` and `FLUSHALL`
-- **Get value type:** <br/> `TYPE rsmq:recognize_eng:Q`
+- **Get value type:** <br/> `TYPE [key]`
 - **List all keys:** <br/> `KEYS *`

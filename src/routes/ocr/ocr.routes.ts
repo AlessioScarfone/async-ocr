@@ -3,9 +3,8 @@ import { body, query, validationResult } from "express-validator";
 import { EXPRESS_CONTEXT_KEY } from "../../app";
 import env from "../../config/env";
 import RedisRequestModel from "../../models/RedisRequest.model";
+import RedisBullQueueManger from "../../services/Redis/RedisBullQueueManager";
 import RedisClient from "../../services/Redis/RedisClient";
-// import RedisPublisher from "../../services/Redis/RedisPublisher";
-import RedisQueueManger from "../../services/Redis/RedisQueueManager";
 import { ACCEPTED_LANGUAGE } from "../../services/Tesseract/TesseractTypes";
 
 const NOT_FOUND_ERROR = "NOT FOUND";
@@ -33,7 +32,7 @@ ocrRouter.post(`${baseUrl}/recognition`,
 
         const { url, lang } = request.body;
 
-        const redisQueueWriter = request.app.get(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER) as RedisQueueManger;
+        const redisQueueWriter = request.app.get(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER) as RedisBullQueueManger;
         try {
             const redisMsg: RedisRequestModel = {
                 key: requestID,
@@ -42,8 +41,9 @@ ocrRouter.post(`${baseUrl}/recognition`,
                     lang: lang
                 }
             };
-            await redisQueueWriter.rsmq.sendMessageAsync({ qname: env.redis.queuePrefix + lang, message: JSON.stringify(redisMsg) });
-            // console.log("Publish on redis:", redisMsg);
+            const queueName = env.redis.queuePrefix + lang;
+            const queueJob = await redisQueueWriter.sendMessage(queueName, redisMsg);
+            console.log(`Job added to queue [${queueName}] - jobId = `, queueJob?.id);
             response.status(200).json({ id: requestID, ...request.body });
         } catch (err) {
             console.log("recognize POST error: [" + requestID + "]: " + err)

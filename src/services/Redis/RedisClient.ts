@@ -33,7 +33,7 @@ export default class RedisClient extends AbstractRedisService {
             // console.log("Redis Write message", key, message);
             if(key) {
                 return this.client.set(key, JSON.stringify(message), {
-                    EX: env.redis.expiracy,
+                    EX: env.redis.expiracy || 21600,
                     NX: true
                 })
             } else {

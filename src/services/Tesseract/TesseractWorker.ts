@@ -1,5 +1,5 @@
 import path from "path";
-import Tesseract, { createScheduler, RecognizeResult } from "tesseract.js";
+import Tesseract from "tesseract.js";
 import IProcessor from "../../models/IProcessor";
 import { ACCEPTED_LANGUAGE } from "./TesseractTypes";
 
@@ -20,16 +20,16 @@ import { ACCEPTED_LANGUAGE } from "./TesseractTypes";
 //     }
 // }
 
-type TesseractProcessorInput = {
+type TesseractWorkerInput = {
     url: string;
     lang: string;
 }
-type TesseractProcessorOutput = {
+type TesseractWorkerOutput = {
     confidence: number;
     text: string;
 }
 
-class TesseractProcessor implements IProcessor<TesseractProcessorInput, TesseractProcessorOutput> {
+class TesseractWorker implements IProcessor<TesseractWorkerInput, TesseractWorkerOutput> {
     private langPath: string;
     private lang: string;
     private worker!: Tesseract.Worker;
@@ -40,7 +40,7 @@ class TesseractProcessor implements IProcessor<TesseractProcessorInput, Tesserac
 
         this.langPath = langPath || path.join(__dirname, 'lang');
         this.lang = lang;
-        console.log("TesseractProcessor: constructor:", { lang: this.lang, langPath: this.langPath })
+        console.log("TesseractProcessor created:", { lang: this.lang, langPath: this.langPath })
     }
 
     public async init(): Promise<string> {
@@ -59,7 +59,7 @@ class TesseractProcessor implements IProcessor<TesseractProcessorInput, Tesserac
         return this.worker.terminate();
     }
 
-    public async process(input: TesseractProcessorInput) {
+    public async process(input: TesseractWorkerInput) {
         if (input.url) {
             // await this.init();
             // const ocrResult = await this.worker.recognize(input?.imgUrl);
@@ -74,7 +74,7 @@ class TesseractProcessor implements IProcessor<TesseractProcessorInput, Tesserac
             const ocrResult = await Tesseract.recognize(input?.url, this.lang, {
                 gzip: true, langPath: this.langPath
             });
-            const result: TesseractProcessorOutput = {
+            const result: TesseractWorkerOutput = {
                 confidence: ocrResult?.data?.confidence,
                 text: ocrResult?.data?.text
             }
@@ -140,5 +140,5 @@ class TesseractProcessor implements IProcessor<TesseractProcessorInput, Tesserac
 }*/
 
 
-export { TesseractProcessorInput, TesseractProcessorOutput }
-export default TesseractProcessor
+export {  TesseractWorkerInput, TesseractWorkerOutput }
+export default TesseractWorker
