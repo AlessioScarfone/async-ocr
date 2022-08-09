@@ -8,6 +8,8 @@ import requestIDMiddleware from "./middlewares/request-id.middleware";
 import env from "./config/env";
 import loadMonitorPage from "./loaders/loadMonitorPage";
 import loadHelmetMiddleware from "./loaders/loadHelmetMiddleware";
+import loadBullMonitorPage from "./loaders/loadBullMonitorPage";
+import RedisBullQueueManger from "./services/Redis/RedisBullQueueManager";
 
 const EXPRESS_CONTEXT_KEY = {
   REDIS_CLIENT: "redisClient",
@@ -15,11 +17,9 @@ const EXPRESS_CONTEXT_KEY = {
 }
 
 const loadExpressMiddleware = (app: Express) => {
-  if (env.monitor.enabled && env.monitor.user && env.monitor.page && env.monitor.password)
-    loadMonitorPage(app)
-  else
-    console.log(">> Monitor not configured <<")
-
+  loadMonitorPage(app)
+  loadBullMonitorPage(app)
+  
   loadHelmetMiddleware(app);
   app.use(cors());
   app.use(requestIDMiddleware());
@@ -36,7 +36,7 @@ const loadExpressMiddleware = (app: Express) => {
 }
 
 const logRegisteredRoutes = (app: Express) => {
-  console.log("== Registered Routes ==")
+  console.log("\n========= Registered Routes =========")
   const routes = app._router.stack.map((middleware: any) => {
     if (middleware.route)
       return { path: middleware?.route?.path, methods: middleware?.route?.methods }
@@ -49,7 +49,7 @@ const logRegisteredRoutes = (app: Express) => {
   }).flat(Infinity).filter((e: any) => e)
 
   console.log(routes);
-  console.log("=======================")
+  console.log("=====================================\n")
 }
 
 

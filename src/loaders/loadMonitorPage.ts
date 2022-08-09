@@ -23,14 +23,16 @@ const loadMonitorPage = (app: Express) => {
 
         const realm = nanoid();
         // console.log("STATUS PAGE - realm: " + realm);
-        app.get(`/admin/${env.monitor.page}`, expressBasicAuth({
+        app.get(`${env.monitor.page}`, expressBasicAuth({
             users,
             challenge: true,
             realm
         }), (statusMonitor as any).pageRoute); // use the pageRoute property to serve the dashboard html page
         // app.use(monitor(monitorConfig(PORT, '/status')));
+
+        console.log(">> Monitor configured <<")
     } else {
-        console.log("STATUS PAGE NOT INITIALIZED")
+        console.log(">> Monitor not configured <<")
     }
 }
 
