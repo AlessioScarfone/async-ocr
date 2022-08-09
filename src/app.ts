@@ -9,10 +9,15 @@ import env from "./config/env";
 import loadMonitorPage from "./loaders/loadMonitorPage";
 import loadHelmetMiddleware from "./loaders/loadHelmetMiddleware";
 
+const EXPRESS_CONTEXT_KEY = {
+  REDIS_CLIENT: "redisClient",
+  REDIS_QUEUE_MANAGER: "redisQueueManager"
+}
+
 const loadExpressMiddleware = (app: Express) => {
   if (env.monitor.enabled && env.monitor.user && env.monitor.page && env.monitor.password)
     loadMonitorPage(app)
-  else 
+  else
     console.log(">> Monitor not configured <<")
 
   loadHelmetMiddleware(app);
@@ -55,13 +60,14 @@ const createApp = (logRoute = true): Express => {
   // attach router
   app.use('/', Routers.adminRouter);
   app.use('/', Routers.ocrRouter);
-  
-  if(logRoute)
+
+  if (logRoute)
     logRegisteredRoutes(app);
 
   return app;
 }
 
 export default createApp;
+export { EXPRESS_CONTEXT_KEY }
 
 

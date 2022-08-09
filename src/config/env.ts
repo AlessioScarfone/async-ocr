@@ -15,6 +15,10 @@ function getEnv(key: string): string {
     return process.env[key] as string;
 }
 
+function toNumber(value: string): number {
+    return parseInt(value, 10);
+}
+
 const env = {
     node_env: process.env.NODE_ENV || "production",
     port: process.env.PORT || 8080,
@@ -23,6 +27,14 @@ const env = {
         page: process.env.MONITOR_ROUTE,
         user: process.env.MONITOR_USERNAME,
         password: process.env.MONITOR_PASSWORD
+    },
+    redis: {
+        password: process.env.REDIS_PASSWORD,
+        user: process.env.REDIS_USERNAME,
+        port: process.env.REDIS_PORT || "6379",
+        host: process.env.REDIS_HOST || "127.0.0.1",
+        queuePrefix: process.env.REDIS_QUEUE_RECOGNIZE || "recognize_",
+        expiracy: toNumber(process.env.REDIS_EXPIRACY || "21600") 
     }
 }
 
