@@ -2,7 +2,8 @@ import Queue, { JobOptions } from "bull";
 import env from "../../config/env";
 
 const DEFAULT_QUEUE_OPTS: JobOptions = {
-    removeOnComplete: true,
+    // removeOnComplete: true,  //remove all completed job
+    removeOnComplete: 50, //preserve last 50 job in completed queue
     attempts: 2,
     backoff: 10000
 }
@@ -12,7 +13,24 @@ const DEFAULT_QUEUE_OPTS: JobOptions = {
  */
 export default class RedisBullQueueManger {
 
-    private queueList: Map<string, Queue.Queue<any>> = new Map();
+    private static instance: RedisBullQueueManger;
+    private queueList: Map<string, Queue.Queue<any>>;
+
+    private constructor() {
+        this.queueList = new Map();
+    }
+
+    public getQueueList() {
+        return [...this.queueList.values()];
+    }
+
+    public static getInstance() {
+        if (!RedisBullQueueManger.instance) {
+            RedisBullQueueManger.instance = new RedisBullQueueManger();
+        }
+
+        return RedisBullQueueManger.instance;
+    }
 
     public createQueue(qname: string): Queue.Queue<any> {
         if (!qname)
@@ -28,7 +46,7 @@ export default class RedisBullQueueManger {
         })
 
         this.queueList.set(qname, queue);
-        console.log(`> Queue [${queue.name}] ready`)
+        console.log(`>> Queue [${queue.name}] ready <<`)
 
         return queue;
     }
