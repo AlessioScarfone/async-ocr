@@ -17,10 +17,11 @@
   "keywords": [
     "express",
     "typescript",
-    "template",
     "rest",
+    "redis",
+    "bull",
     "api",
-    "boilerplate"
+    "ocr"
   ],
   "author": "Alessio Scarfone",
   "license": "MIT",
