@@ -74,6 +74,9 @@ ocrRouter.get(`${baseUrl}/recognition/result`,
             //TODO: cancella i record o lasciali scadere ?? 
             record = record ? JSON.parse(record) : NOT_FOUND_ERROR;
 
+            if(record == NOT_FOUND_ERROR)
+                return response.status(404).json({ result: record });
+                
             return response.status(200).json({ result: record });
         } catch (err) {
             console.log("recognize GET error: [" + requestID + "]: " + err)
