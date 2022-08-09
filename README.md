@@ -1,5 +1,5 @@
 # Async OCR
-<p style="text-align: center">
+<p align="center">
 Asynchronous REST OCR API.
 </p>
 
