@@ -1,8 +1,10 @@
 import Queue, { JobOptions } from "bull";
 import env from "../../config/env";
 
-const DEFAULT_QUEUE_OPTS = {
-    removeOnComplete: true
+const DEFAULT_QUEUE_OPTS: JobOptions = {
+    removeOnComplete: true,
+    attempts: 2,
+    backoff: 10000
 }
 
 /**
@@ -50,7 +52,7 @@ export default class RedisBullQueueManger {
         return this.queueList.get(qname)?.add(msg, addOpts);
     }
 
-    public addProcessorOnQueue(qname: string, fn: Queue.ProcessCallbackFunction<any>) {
+    public addProcessorOnQueue(qname: string, fn: Queue.ProcessPromiseFunction<any>) {
         this.checkIfQueueExist(qname);
         this.queueList.get(qname)?.process(fn);
     }
@@ -61,7 +63,7 @@ export default class RedisBullQueueManger {
 
         const closePromise = Array.from(this.queueList).map(([key, value]) => {
             console.log(`Closing queue: ${key}`)
-            return value.close()
+            return value?.close()
         });
         return closePromise;
     }

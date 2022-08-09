@@ -1,40 +1,25 @@
 import 'jest';
+import RedisBullQueueManger from '../services/Redis/RedisBullQueueManager';
 import RedisClient from '../services/Redis/RedisClient';
-import RedisPublisher from '../services/Redis/RedisPublisher';
-import RedisSubscriber from '../services/Redis/RedisSubscriber';
-import { jestWait } from './helper/integration-helpers';
 
 jest.setTimeout(15000);
 
-describe('Redis Client', () => {
+describe('Redis/Queue Test', () => {
     let redisClient: RedisClient;
-    let redisPublisher: RedisPublisher<string>;
-    let redisSubscriber: RedisSubscriber<string>;
-    const channel = "jest_test";
-    const subscribedMsg: string[] = [];
+    let bullQueueManger: RedisBullQueueManger;
+    const queue = "jest_test";
 
     beforeAll(async () => {
+        bullQueueManger = new RedisBullQueueManger();
         redisClient = RedisClient.getInstance();
-        redisPublisher = new RedisPublisher(redisClient.client, channel);
-        redisSubscriber = new RedisSubscriber(redisClient.client, channel);
-
         await redisClient.connect();
-        await redisPublisher.connect();
-        await redisSubscriber.connect();
-
-        await redisSubscriber.subscribe(
-            (msg: string) => {
-                console.log("Subscriber Read:", msg);
-                subscribedMsg.push(msg);
-            }
-        )
+        bullQueueManger.createQueue(queue);
     })
 
     afterAll(async () => {
+        await bullQueueManger.getQueue(queue)?.obliterate({ force: true });
+        await bullQueueManger.disconnect();
         await redisClient.disconnect();
-        await redisPublisher.disconnect();
-        await redisSubscriber.unsubscribe();
-        await redisSubscriber.disconnect();
     })
 
     it('Redis Ping', async () => {
@@ -52,14 +37,16 @@ describe('Redis Client', () => {
         expect(res2).toBeNull();
     })
 
-    it('Redis Pub/Sub', async () => {
-        expect(subscribedMsg.length).toEqual(0);
-        const msg = "test message";
-        const pubRes = await redisPublisher.publish(msg);
-        expect(pubRes).toEqual(1);
-        await jestWait(500);
-        expect(subscribedMsg.length).toBeGreaterThan(0);
-        console.log(subscribedMsg);
+    it('Bull queue write/read', async () => {
+        const data = { msg: "jest_test" }
+        const res = await bullQueueManger.sendMessage(queue, data);
+        expect(res).not.toBeNull();
+        expect(res?.id).not.toBeNull();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const job = await bullQueueManger.getQueue(queue)?.getJob(res!.id);
+        expect(job).not.toBeNull();
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect(job!.data).toEqual(data);
     })
 
     //ultimo test
