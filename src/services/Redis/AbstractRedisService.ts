@@ -6,31 +6,33 @@ export default abstract class AbstractRedisService {
     public client!: CreateRedisClientType
     protected ready = false;
     protected connected = false;
+    private label = "";
 
 
-    public init(client: CreateRedisClientType) {
+    public init(client: CreateRedisClientType, label = "") {
         this.client = client;
+        this.label = label;
     }
 
-    public initEventListener(client: CreateRedisClientType, label = "") {
+    public initEventListener(client: CreateRedisClientType) {
         client.on('connect', () => {
-            console.log(`Redis Client [${label}] : connect`);
+            console.log(`>> Redis Client [${this.label}] : connect <<`);
             this.connected = true;
         });
 
         client.on('ready', () => {
-            console.log(`Redis Client [${label}] : ready`);
+            console.log(`>> Redis Client [${this.label}] : ready <<`);
             this.ready = true;
         });
 
         client.on('error', () => {
-            console.log(`Redis Client [${label}] : error`);
+            console.log(`>> Redis Client [${this.label}] : error <<`);
             this.ready = false;
             this.connected = false;
         });
 
         client.on('end', () => {
-            console.log(`Redis Client [${label}] : end`);
+            console.log(`>> Redis Client [${this.label}] : end <<`);
             this.ready = false;
             this.connected = false;
         });
@@ -41,7 +43,7 @@ export default abstract class AbstractRedisService {
         if (this.connected)
             return this.disconnectMethod();
         else {
-            console.log("Already Disconnected")
+            console.log(`>> Redis Client [${this.label}] : Already Disconnected <<`)
             return Promise.resolve();
         }
     }
