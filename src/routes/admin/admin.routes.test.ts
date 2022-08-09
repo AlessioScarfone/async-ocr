@@ -20,7 +20,7 @@ describe('Admin Router tests', () => {
         // console.log(env.monitor);
         if (env.monitor.enabled && env.monitor.page && env.monitor.password && env.monitor.user) {
             const response = await request(app)
-                .get(`/admin/${env.monitor.page}`)
+                .get(`${env.monitor.page}`)
                 .auth(env.monitor.user, env.monitor.password);
 
             expect(response.statusCode).toBe(200);

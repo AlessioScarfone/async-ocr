@@ -10,7 +10,7 @@ describe('Redis/Queue Test', () => {
     const queue = "jest_test";
 
     beforeAll(async () => {
-        bullQueueManger = new RedisBullQueueManger();
+        bullQueueManger = RedisBullQueueManger.getInstance();
         redisClient = RedisClient.getInstance();
         await redisClient.connect();
         bullQueueManger.createQueue(queue);
