@@ -21,8 +21,8 @@ Asynchronous REST OCR API.
 
 ## Script
 
-- `start` : run on development mode 
-- `start-prod` : run on production mode
+- `start-dev` : run locally on development mode 
+- `start-prod` : run locally on production mode
 - `test` : run test
 - `build` : build project
 
