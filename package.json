@@ -7,7 +7,7 @@
     "start-dev": "npm run clear && nodemon -r dotenv/config --watch src src/index.ts dotenv_config_path=.env",
     "start-dev:log": "npm run start 2>&1| tee log.txt",
     
-    "build": "rimraf dist && tsc --project tsconfig.build.json",
+    "build": "npm install && rimraf dist && tsc --project tsconfig.build.json",
     "postbuild": "copyfiles --up 1 \"src/services/Tesseract/lang/*\" \"dist\"",
 
     "prestart-prod": "npm run clear && npm run build",
