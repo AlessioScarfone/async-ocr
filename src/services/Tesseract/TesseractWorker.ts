@@ -1,5 +1,6 @@
 import path from "path";
 import Tesseract from "tesseract.js";
+import { getErrorMessage } from "../../models/Error";
 import IProcessor from "../../models/IProcessor";
 import { ACCEPTED_LANGUAGE } from "./TesseractTypes";
 
@@ -25,8 +26,9 @@ type TesseractWorkerInput = {
     lang: string;
 }
 type TesseractWorkerOutput = {
-    confidence: number;
-    text: string;
+    confidence?: number;
+    text?: string;
+    error?: string;
 }
 
 class TesseractWorker implements IProcessor<TesseractWorkerInput, TesseractWorkerOutput> {
@@ -71,14 +73,20 @@ class TesseractWorker implements IProcessor<TesseractWorkerInput, TesseractWorke
             // return result;
 
             // V2
-            const ocrResult = await Tesseract.recognize(input?.url, this.lang, {
-                gzip: true, langPath: this.langPath
-            });
-            const result: TesseractWorkerOutput = {
-                confidence: ocrResult?.data?.confidence,
-                text: ocrResult?.data?.text
+            try {
+                const ocrResult = await Tesseract.recognize(input?.url, this.lang, {
+                    gzip: true, langPath: this.langPath
+                });
+                const result: TesseractWorkerOutput = {
+                    confidence: ocrResult?.data?.confidence,
+                    text: ocrResult?.data?.text
+                }
+                return result;
+            } catch (err) {
+                const errorMessage = getErrorMessage(err);
+                console.error("Tesseract error: " + errorMessage)
+                return Promise.reject(errorMessage)
             }
-            return result;
         } else {
             throw new Error("img 'url' not found");
         }
@@ -140,5 +148,5 @@ class TesseractWorker implements IProcessor<TesseractWorkerInput, TesseractWorke
 }*/
 
 
-export {  TesseractWorkerInput, TesseractWorkerOutput }
+export { TesseractWorkerInput, TesseractWorkerOutput }
 export default TesseractWorker

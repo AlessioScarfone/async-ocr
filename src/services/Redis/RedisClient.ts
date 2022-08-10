@@ -37,10 +37,10 @@ export default class RedisClient extends AbstractRedisService {
                     NX: true
                 })
             } else {
-                return Promise.reject(`Redis Client writeMessage - key is missing. msg [ ${message} ]`);  
+                return Promise.reject(new Error(`Redis Client writeMessage - key is missing. msg [ ${message} ]`));  
             }
         } else {
-            return Promise.reject("Redis Client not ready");
+            return Promise.reject(new Error("Redis Client not ready"));
         }
     }
 
@@ -48,7 +48,7 @@ export default class RedisClient extends AbstractRedisService {
         if (this.ready) {
             return this.client.get(key)
         } else {
-            return Promise.reject("Redis Client not ready");
+            return Promise.reject(new Error("Redis Client not ready"));
         }
     }
 
