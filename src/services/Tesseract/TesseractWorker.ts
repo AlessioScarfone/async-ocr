@@ -2,67 +2,38 @@ import path from "path";
 import Tesseract from "tesseract.js";
 import { getErrorMessage } from "../../models/Error";
 import IProcessor from "../../models/IProcessor";
+import { OCRWorkerInput } from "./OCRWorkerInput";
+import { OCRWorkerOutput } from "./OCRWorkerOutput";
 import { ACCEPTED_LANGUAGE } from "./TesseractTypes";
 
-// const langPath = path.join(__dirname, 'lang')
-// console.log("LANG LOCAL PATH:", langPath, "\n \n");
-
-// const recognize = async (imgUrl: string, lang: string) => {
-//     try {
-//         const worker = Tesseract.createWorker({ langPath })
-//         await worker.load();
-//         await worker.loadLanguage(lang);
-//         await worker.initialize(lang);
-//         const data = await worker.recognize(imgUrl);
-//         await worker.terminate();
-//         return data;
-//     } catch (error) {
-//         console.log("Tesseract recognize error: ", { imgUrl, lang }, error)
-//     }
-// }
-
-type TesseractWorkerInput = {
-    url: string;
-    lang: string;
-}
-type TesseractWorkerOutput = {
-    confidence?: number;
-    text?: string;
-    error?: string;
-}
-
-class TesseractWorker implements IProcessor<TesseractWorkerInput, TesseractWorkerOutput> {
+class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
     private langPath: string;
-    private lang: string;
     private worker!: Tesseract.Worker;
 
-    constructor(lang: string, langPath?: string) {
-        if (!ACCEPTED_LANGUAGE.includes(lang))
-            throw new Error("lang '" + lang + "' not supported")
+    constructor(langPath?: string) {
 
         this.langPath = langPath || path.join(__dirname, 'lang');
-        this.lang = lang;
-        console.log("TesseractProcessor created:", { lang: this.lang, langPath: this.langPath })
+        console.log("TesseractProcessor created:", { langPath: this.langPath })
     }
 
-    public async init(): Promise<string> {
-        try {
-            this.worker = Tesseract.createWorker({ langPath: this.langPath });
-            await this.worker.load();
-            await this.worker.loadLanguage(this.lang);
-            await this.worker.initialize(this.lang);
-            return `TesseractProcessor: init END - lang [${this.lang}]`
-        } catch (err) {
-            throw new Error("TesseractProcessor: Error init TesseractWorker: " + err)
-        }
-    }
+    // public async init(): Promise<string> {
+    //     try {
+    //         this.worker = Tesseract.createWorker({ langPath: this.langPath });
+    //         await this.worker.load();
+    //         await this.worker.loadLanguage(this.lang);
+    //         await this.worker.initialize(this.lang);
+    //         return `TesseractProcessor: init END - lang [${this.lang}]`
+    //     } catch (err) {
+    //         throw new Error("TesseractProcessor: Error init TesseractWorker: " + err)
+    //     }
+    // }
 
     public async destroy(): Promise<Tesseract.ConfigResult> {
         return this.worker.terminate();
     }
 
-    public async process(input: TesseractWorkerInput) {
-        if (input.url) {
+    public async process(input: OCRWorkerInput) {
+        if (input.url && input.lang) {
             // await this.init();
             // const ocrResult = await this.worker.recognize(input?.imgUrl);
             // const result: TesseractProcessorOutput = {
@@ -74,21 +45,29 @@ class TesseractWorker implements IProcessor<TesseractWorkerInput, TesseractWorke
 
             // V2
             try {
-                const ocrResult = await Tesseract.recognize(input?.url, this.lang, {
-                    gzip: true, langPath: this.langPath
+                if (!ACCEPTED_LANGUAGE.includes(input.lang))
+                    throw new Error("lang '" + input.lang + "' not supported")
+
+                const ocrResult = await Tesseract.recognize(input?.url, input.lang, {
+                    gzip: true,
+                    langPath: this.langPath,
+                    errorHandler: (err) => {
+                        const errorMessage = getErrorMessage(err);
+                        console.log(" !! Nested tesseract ERROR:", errorMessage, "; INPUT:", input)
+                    }
                 });
-                const result: TesseractWorkerOutput = {
+                const result: OCRWorkerOutput = {
                     confidence: ocrResult?.data?.confidence,
                     text: ocrResult?.data?.text
                 }
                 return result;
             } catch (err) {
                 const errorMessage = getErrorMessage(err);
-                console.error("Tesseract error: " + errorMessage)
+                console.error("Tesseract Worker error: " + errorMessage)
                 return Promise.reject(errorMessage)
             }
         } else {
-            throw new Error("img 'url' not found");
+            throw new Error("Processor: Input not valid");
         }
     }
 
@@ -148,5 +127,5 @@ class TesseractWorker implements IProcessor<TesseractWorkerInput, TesseractWorke
 }*/
 
 
-export { TesseractWorkerInput, TesseractWorkerOutput }
+export { OCRWorkerInput, OCRWorkerOutput as OCRWorkerOutput }
 export default TesseractWorker

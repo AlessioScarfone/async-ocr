@@ -21,7 +21,7 @@ Promise.all([
     // bullQueueManger.addProcessorOnQueue(RECOGNIZE_QUEUE_ENG,  (j,done) => {console.log("process", j.data); done()})
     bullQueueManger.addProcessorOnQueue(
         RECOGNIZE_QUEUE_ENG,
-        tesseractProcessorFactory('eng', redisClient)
+        tesseractProcessorFactory(redisClient)
     )
 
     app.set(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER, bullQueueManger);
