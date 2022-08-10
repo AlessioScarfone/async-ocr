@@ -48,6 +48,9 @@ const env = {
         user: process.env.SWAGGER_USERNAME,
         password: process.env.SWAGGER_PASSWORD,
         showAdminSection: toBool(process.env.SWAGGER_SHOW_ADMIN_SECTION)
+    },
+    rapidApi: {
+        proxySecret: process.env.RAPID_API_PROXY_SECRET
     }
 }
 
