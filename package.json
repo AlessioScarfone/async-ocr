@@ -1,6 +1,6 @@
 {
   "name": "async-ocr",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "Async OCR",
   "main": "server.js",
   "scripts": {
