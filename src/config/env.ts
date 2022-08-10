@@ -41,6 +41,12 @@ const env = {
         page: process.env.BULL_MONITOR_ROUTE,
         user: process.env.BULL_MONITOR_USERNAME,
         password: process.env.BULL_MONITOR_PASSWORD,
+    },
+    swagger: {
+        enabled: toBool(process.env.SWAGGER_ENABLED),
+        page: process.env.SWAGGER_ROUTE,
+        user: process.env.SWAGGER_USERNAME,
+        password: process.env.SWAGGER_PASSWORD,
     }
 }
 

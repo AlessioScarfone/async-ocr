@@ -8,8 +8,11 @@ import requestIDMiddleware from "./middlewares/request-id.middleware";
 import loadMonitorPage from "./loaders/loadMonitorPage";
 import loadHelmetMiddleware from "./loaders/loadHelmetMiddleware";
 import loadBullMonitorPage from "./loaders/loadBullMonitorPage";
+import loadSwaggerPage from "./loaders/loadSwaggerPage";
+import env from "./config/env";
 
 let bullMonitorConfiguredEsit = false;
+let swaggerConfiguredEsit = false;
 
 const EXPRESS_CONTEXT_KEY = {
   REDIS_CLIENT: "redisClient",
@@ -33,6 +36,8 @@ const loadExpressMiddleware = (app: Express) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   morgan.token('requestID', (req: Request, res: Response): string => req.requestID);
   app.use(morgan('[:date[clf]] :method :url :status [:requestID] :response-time ms - body = :body'));
+
+  swaggerConfiguredEsit = loadSwaggerPage(app);
 }
 
 const logRegisteredRoutes = (app: Express) => {
@@ -48,9 +53,10 @@ const logRegisteredRoutes = (app: Express) => {
     }
   }).flat(Infinity).filter((e: any) => e)
 
-  if(bullMonitorConfiguredEsit) {
-    routes.push({ path: '/admin/status/bull', methods: { get: true } })
-  }
+  if(bullMonitorConfiguredEsit) 
+    routes.push({ path: env.bullMonitor.page, methods: { get: true } })
+  if(swaggerConfiguredEsit) 
+    routes.push({ path: env.swagger.page, methods: { get: true } })
   console.log(routes);
   console.log("=====================================\n")
 }
