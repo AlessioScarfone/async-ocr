@@ -1,0 +1,170 @@
+openapi: 3.0.3
+info:
+  title: Async Rest OCR
+  description: Async REST OCR API
+  version: 0.0.1
+servers:
+  - url: https://localhost:8080/api
+tags:
+  - name: OCR
+    description: Extract Text From an Image
+  - name: Admin
+    description: Administration utilities
+paths:
+  /admin/health:
+    get:
+      tags:
+        - Admin
+      summary: server health check
+      responses:
+        '200':
+          description: Server available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+  /ocr/recognize:
+    post:
+      tags:
+        - OCR
+      summary: ask for text extraction
+      requestBody:
+        description: Enter request to extract text from the image
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecognizeRequest'
+      responses:
+        '200':
+          description: The request has been accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognizeResponse'
+        '400':
+          description: Input not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+                
+  /ocr/recognize/result:
+    get:
+      tags:
+        - OCR
+      summary: retrive text extraction result
+      parameters:
+        - name: id
+          in: query
+          description: Request identifier
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Result found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OCRWorkerOutput'
+              examples:
+                success:
+                  value:
+                    confidence: 98
+                    text: "lorem... ipsum.."
+                fetch image error:
+                  value:
+                    error: "reason: getaddrinfo ENOTFOUND mysite.com"
+        '404':
+          description: result found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OCRWorkerOutput'
+              examples:
+                not found error:
+                  value:
+                    error: NOT FOUND
+
+components:
+  schemas:
+    Status:
+      type: object
+      properties:
+        uptime:
+          type: number
+          format: float
+        message:
+          type: string
+          enum:
+            - ok
+        timestamp:
+          type: number
+      example:
+        uptime: 74.820424875
+        message: ok
+        timestamp: 1660058349818
+    
+    
+    RecognizeRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        lang:
+          type: string
+          enum:
+            - eng
+      example:
+        url: https://mysite/img.png
+        lang: eng
+    
+    RecognizeResponse:
+      allOf:
+        - $ref: '#/components/schemas/RecognizeRequest'
+        - type: object
+          properties:
+            id:
+              type: string
+      example:
+        id: YioXNGsgXoJSCshxUo_K8
+        url: https://mysite/loremIpsumImg.png
+        lang: eng
+        
+        
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              msg:
+                type: string
+              param:
+                type: string
+              location:
+                type: string
+      example:
+        errors:
+          - value: egng
+            msg: Invalid Lang
+            param: lang
+            location: body
+            
+            
+    OCRWorkerOutput:
+      properties:
+        confidence:
+          type: number
+        text:
+          type: string
+        error:
+          type: string
+      example:
+          confidence: 98
+          text: lorem ipsum ...

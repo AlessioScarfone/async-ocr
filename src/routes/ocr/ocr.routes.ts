@@ -6,8 +6,9 @@ import RedisRequestModel from "../../models/RedisRequest.model";
 import RedisBullQueueManger from "../../services/Redis/RedisBullQueueManager";
 import RedisClient from "../../services/Redis/RedisClient";
 import { ACCEPTED_LANGUAGE } from "../../services/Tesseract/TesseractTypes";
+import { OCRWorkerOutput } from "../../services/Tesseract/OCRWorkerOutput";
 
-const NOT_FOUND_ERROR = "NOT FOUND";
+const NOT_FOUND_ERROR: OCRWorkerOutput = { error: "NOT FOUND" };
 const GENERIC_ERROR = "GENERIC ERROR";
 
 const ocrRouter = Router();
@@ -70,14 +71,14 @@ ocrRouter.get(`${baseUrl}/recognition/result`,
 
         try {
             const redisClient = request.app.get(EXPRESS_CONTEXT_KEY.REDIS_CLIENT) as RedisClient;
-            let record = await redisClient.readMessage(id);
-            //TODO: cancella i record o lasciali scadere ?? 
-            record = record ? JSON.parse(record) : NOT_FOUND_ERROR;
+            const redisRecord = await redisClient.readMessage(id);
+            //I record restano disponibili fino alla scadenza
+            const ocrOutput = redisRecord ? JSON.parse(redisRecord) as OCRWorkerOutput : NOT_FOUND_ERROR;
+            let statusCode = 200;
+            if (!redisRecord)
+                statusCode = 404;
 
-            if(record == NOT_FOUND_ERROR)
-                return response.status(404).json({ result: record });
-                
-            return response.status(200).json({ result: record });
+            return response.status(statusCode).json(ocrOutput);
         } catch (err) {
             console.log("recognize GET error: [" + requestID + "]: " + err)
             response.status(500).json({ error: 'Generic Error' });

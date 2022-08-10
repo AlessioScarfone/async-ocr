@@ -2,7 +2,11 @@ import Queue, { Job } from "bull";
 import { getErrorMessage } from "../../models/Error";
 import RedisRequestModel from "../../models/RedisRequest.model";
 import RedisClient from "../Redis/RedisClient";
-import TesseractWorker, { TesseractWorkerInput, TesseractWorkerOutput } from "./TesseractWorker";
+import TesseractWorker from "./TesseractWorker";
+import { OCRWorkerOutput } from "./OCRWorkerOutput";
+import { OCRWorkerInput } from "./OCRWorkerInput";
+
+const GENERIC_ERROR = "Generic error";
 
 const tesseractProcessorFactory = (lang: string, redisClient: RedisClient): Queue.ProcessPromiseFunction<any> => {
     const tesseractWorker: TesseractWorker = new TesseractWorker(lang);
@@ -12,11 +16,11 @@ const tesseractProcessorFactory = (lang: string, redisClient: RedisClient): Queu
         const msg = job?.data as RedisRequestModel;
         console.log(`Process job [${job?.id}] - Message: `, msg);
 
-        const input: TesseractWorkerInput = {
+        const input: OCRWorkerInput = {
             ...msg.value
         }
         // console.log("TesseractProcessorInput:", input);
-        let tesseractOutput: TesseractWorkerOutput | null = null;
+        let tesseractOutput: OCRWorkerOutput | null = null;
         try {
             tesseractOutput = await tesseractWorker.process(input);
         } catch (err) {
@@ -25,6 +29,9 @@ const tesseractProcessorFactory = (lang: string, redisClient: RedisClient): Queu
                 const errorToReturn = errorMessage.substring(errorMessage.indexOf("reason")).replace(/"|'/g,"");
                 // console.log("Fetch Image Error: ", err);
                 tesseractOutput = { error: errorToReturn }
+            }
+            else {
+                tesseractOutput = { error: GENERIC_ERROR} 
             }
         }
         job.returnvalue = tesseractOutput
