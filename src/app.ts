@@ -2,14 +2,16 @@ import express, { Express, Request, Response } from "express";
 import compression from "compression";
 import cors from "cors";
 import morgan from "morgan";
-import { errorHandlerMiddleware } from "./middlewares/error-handler.middleware";
+import { errorHandlerMiddleware } from "./middlewares/errorHandler.middleware";
 import * as Routers from "./routes";
-import requestIDMiddleware from "./middlewares/request-id.middleware";
+import requestIDMiddleware from "./middlewares/requestId.middleware";
 import loadMonitorPage from "./loaders/loadMonitorPage";
 import loadHelmetMiddleware from "./loaders/loadHelmetMiddleware";
 import loadBullMonitorPage from "./loaders/loadBullMonitorPage";
 import loadSwaggerPage from "./loaders/loadSwaggerPage";
 import env from "./config/env";
+import { rapidApiProxyCheckMiddleware } from "./middlewares/rapidApiProxyCheck.middleware";
+import RapidApiHeaders from "./models/RepidApiHeaders";
 
 let bullMonitorConfiguredEsit = false;
 let swaggerConfiguredEsit = false;
@@ -31,11 +33,15 @@ const loadExpressMiddleware = (app: Express) => {
   app.use(express.json());
   app.use(errorHandlerMiddleware);
 
+  app.use(rapidApiProxyCheckMiddleware)
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   morgan.token('body', (req: Request, res: Response): string => JSON.stringify(req.body));
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   morgan.token('requestID', (req: Request, res: Response): string => req.requestID);
-  app.use(morgan('[:date[clf]] :method :url :status [:requestID] :response-time ms - body = :body'));
+  morgan.token('rapidApiUser', (req: Request, res: Response): string => req.get(RapidApiHeaders.user) || "MissingUser");
+  morgan.token('rapidApiSubscription', (req: Request, res: Response): string => req.get(RapidApiHeaders.subscription) || "MissingPlan");
+  app.use(morgan('[:date[clf]] :method :url :status [:requestID] [:rapidApiUser ; :rapidApiSubscription] :response-time ms - body = :body'));
 
   swaggerConfiguredEsit = loadSwaggerPage(app);
 }

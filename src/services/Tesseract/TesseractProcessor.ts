@@ -35,7 +35,7 @@ const tesseractProcessorFactory = (redisClient: RedisClient): Queue.ProcessPromi
             }
         }
         job.returnvalue = tesseractOutput
-        console.log(`Process job [${job?.id}] - Result - id: [${msg.key}]`,  tesseractOutput, job.returnvalue);
+        console.log(`Process job [${job?.id}] - Result - id: [${msg.key}]`,  tesseractOutput);
         job.log("Process complete; write result on redis: " + JSON.stringify(tesseractOutput));
         await redisClient.writeMessage(msg.key, tesseractOutput);
         await job.progress(100);
