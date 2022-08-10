@@ -8,8 +8,8 @@ import { OCRWorkerInput } from "./OCRWorkerInput";
 
 const GENERIC_ERROR = "Generic error";
 
-const tesseractProcessorFactory = (lang: string, redisClient: RedisClient): Queue.ProcessPromiseFunction<any> => {
-    const tesseractWorker: TesseractWorker = new TesseractWorker(lang);
+const tesseractProcessorFactory = (redisClient: RedisClient): Queue.ProcessPromiseFunction<any> => {
+    const tesseractWorker: TesseractWorker = new TesseractWorker();
 
     return async (job: Job) => {
         console.log("START JOB PROCESSOR", job?.id);
