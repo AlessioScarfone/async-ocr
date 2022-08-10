@@ -3,11 +3,11 @@
   "info": {
     "title": "Async Rest OCR",
     "description": "Async REST OCR API",
-    "version": "0.0.1"
+    "version": "X.X.X"
   },
   "servers": [
     {
-      "url": "https://localhost:8080/api"
+      "url": "http://localhost:8080/api"
     }
   ],
   "tags": [
@@ -41,7 +41,7 @@
         }
       }
     },
-    "/ocr/recognize": {
+    "/ocr/recognition": {
       "post": {
         "tags": [
           "OCR"
@@ -81,7 +81,7 @@
         }
       }
     },
-    "/ocr/recognize/result": {
+    "/ocr/recognition/result": {
       "get": {
         "tags": [
           "OCR"
