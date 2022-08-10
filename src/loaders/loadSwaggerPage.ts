@@ -26,6 +26,7 @@ const loadSwaggerPage = (app: Express): boolean => {
             swaggerUi.serve,
             swaggerUi.setup(swaggerDocument)
         );
+        console.log(">> Swagger configured <<")
         return true;
     } else {
         console.log(">> Swagger not configured <<")
@@ -35,6 +36,15 @@ const loadSwaggerPage = (app: Express): boolean => {
 
 const updateDynamicSwaggerValue = (swagger: any) => {
     swagger.info.version = pkg.version;
+
+    if (!env.swagger.showAdminSection) {
+        console.log("Hide Admin endpoint from swagger", Object.keys(swagger.paths).filter(p => p.match(/.*admin.*/)));
+        Object.keys(swagger?.paths)
+            .filter(p => p.match(/.*admin.*/))
+            .forEach(adminPath => { delete swagger.paths[adminPath] })
+
+        swagger.tags = swagger.tags.filter((e: any) => e?.name != "Admin");
+    }
 }
 
 export default loadSwaggerPage;

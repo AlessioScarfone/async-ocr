@@ -47,6 +47,7 @@ const env = {
         page: process.env.SWAGGER_ROUTE,
         user: process.env.SWAGGER_USERNAME,
         password: process.env.SWAGGER_PASSWORD,
+        showAdminSection: toBool(process.env.SWAGGER_SHOW_ADMIN_SECTION)
     }
 }
 
