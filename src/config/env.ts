@@ -23,10 +23,11 @@ const env = {
     node_env: process.env.NODE_ENV || "production",
     port: process.env.PORT || 8080,
     redis: {
-        password: process.env.REDIS_PASSWORD,
-        user: process.env.REDIS_USERNAME,
-        port: process.env.REDIS_PORT || "6379",
-        host: process.env.REDIS_HOST || "127.0.0.1",
+        url: process.env.REDIS_URL,
+        // password: process.env.REDIS_PASSWORD,
+        // username: process.env.REDIS_USERNAME,
+        // port: process.env.REDIS_PORT || "6379",
+        // host: process.env.REDIS_HOST || "127.0.0.1",
         queuePrefix: process.env.REDIS_QUEUE_RECOGNIZE || "recognize_",
         expiracy: toNumber(process.env.REDIS_EXPIRACY || "21600") 
     },

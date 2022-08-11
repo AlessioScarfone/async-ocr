@@ -27,9 +27,12 @@ Asynchronous REST OCR API.
 - `build` : build project
 
 ## Install and run Redis via Docker
-1. `docker pull redis`
 
-2. `"redis": "docker run --name redis -d -p 6379:6379 redis redis-server --requirepass 'redispassword'"`
+1. Pull image: `docker pull redis`
+
+
+2. Run with password: `"docker run --name redis -d -p 6379:6379 redis redis-server --requirepass 'redispassword'"`
+3. Run without password: `"docker run --name redis -d -p 6379:6379 redis"`
 
 ### Redis utils command
 

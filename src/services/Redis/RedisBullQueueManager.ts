@@ -1,5 +1,6 @@
 import Queue, { JobOptions } from "bull";
 import env from "../../config/env";
+import RedisConnectionOption from "../../config/redisConnection";
 
 const DEFAULT_QUEUE_OPTS: JobOptions = {
     // removeOnComplete: true,  //remove all completed job
@@ -36,12 +37,19 @@ export default class RedisBullQueueManger {
         if (!qname)
             throw new Error("Queue name not valid");
 
+        const connOption: any = {
+            host: RedisConnectionOption.host,
+            port: parseInt(RedisConnectionOption.port || "6379", 10),
+        }
+
+        if (RedisConnectionOption.password)
+            connOption.password = RedisConnectionOption.password
+        if (RedisConnectionOption.username)
+            connOption.username = RedisConnectionOption.username
+
         const queue = new Queue(qname, {
             redis: {
-                host: env.redis.host,
-                port: parseInt(env.redis.port, 10),
-                password: env.redis.password,
-                username: env.redis.user,
+                ...connOption
             }
         })
 
