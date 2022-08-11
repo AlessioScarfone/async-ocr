@@ -1,7 +1,6 @@
 services:
   api:
     image: 'async-ocr'
-    command: 'npm run prod'
     ports:
       - 8080:8080
     env_file:
