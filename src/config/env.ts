@@ -33,15 +33,15 @@ const env = {
     },
     monitor: {
         enabled: toBool(process.env.MONITOR_ENABLED),
-        page: process.env.MONITOR_ROUTE,
+        page: process.env.MONITOR_ROUTE || "/admin/status",
     },
     bullMonitor: {
         enabled: toBool(process.env.BULL_MONITOR_ENABLED),
-        page: process.env.BULL_MONITOR_ROUTE,
+        page: process.env.BULL_MONITOR_ROUTE || "/admin/bull",
     },
     swagger: {
         enabled: toBool(process.env.SWAGGER_ENABLED),
-        page: process.env.SWAGGER_ROUTE,
+        page: process.env.SWAGGER_ROUTE || "/admin/api-docs",
         showAdminSection: toBool(process.env.SWAGGER_SHOW_ADMIN_SECTION)
     },
     admin: {
