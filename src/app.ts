@@ -28,15 +28,16 @@ const loadExpressMiddleware = (app: Express) => {
   app.use(compression());
   // app.use(express.text());
   app.use(express.json());
-  app.use(requestIDMiddleware());
-  app.use(rapidApiProxyCheckMiddleware);
-  app.use(errorHandlerMiddleware);
 
   morgan.token('body', (req: Request, res: Response): string => JSON.stringify(req.body));
   morgan.token('requestID', (req: Request, res: Response): string => req.requestID);
   morgan.token('rapidApiUser', (req: Request, res: Response): string => req.get(RapidApiHeaders.user) || "MissingUser");
   morgan.token('rapidApiSubscription', (req: Request, res: Response): string => req.get(RapidApiHeaders.subscription) || "MissingPlan");
-  app.use(morgan('[:date[clf]] :method :url :status [:requestID] [:rapidApiUser ; :rapidApiSubscription] :response-time ms - body = :body'));
+  app.use(morgan('[:date[clf]] :method :url :status [:requestID] [:rapidApiUser;:rapidApiSubscription] :response-time ms - body = :body'));
+
+  app.use(requestIDMiddleware());
+  app.use(rapidApiProxyCheckMiddleware);
+  app.use(errorHandlerMiddleware);
 
   loadMonitorPage(app)
   bullMonitorConfiguredEsit = loadBullMonitorPage(app);
