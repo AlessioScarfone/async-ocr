@@ -1,0 +1,13 @@
+services:
+  api:
+    image: 'async-ocr'
+    command: 'npm run prod'
+    ports:
+      - 8080:8080
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      #Ovverride static REDIS_URL for docker compose use
+  redis:
+    image: redis
