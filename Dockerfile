@@ -14,8 +14,6 @@ RUN rm -rf src
 
 RUN npm prune --production
 
-RUN pwd
-
-RUN ls
+# RUN ls dist/services/Tesseract/lang
 
 CMD npm run prod
