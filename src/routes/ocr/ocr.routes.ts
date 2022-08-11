@@ -19,7 +19,9 @@ const baseUrl = "/api/ocr"
  * Ask for OCR recognition
  */
 ocrRouter.post(`${baseUrl}/recognition`,
-    body('url').exists().isURL({ protocols: ['https', 'http'] }).withMessage('Invalid URL'),
+    body('url')
+        .exists().isURL({ protocols: ['https', 'http'] }).withMessage('Invalid URL')
+        .matches(/^.*(bmp|jpg|png)$/).withMessage('Image extension not supported. (Supported format: bmp, jpg, png)'),
     body('lang').exists().isString().isIn(ACCEPTED_LANGUAGE).withMessage('Invalid Lang'),
     async (request: Request, response: Response) => {
         // ==== START: input validation ===

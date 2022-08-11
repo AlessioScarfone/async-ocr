@@ -12,8 +12,9 @@ import RapidApiHeaders from "../models/RepidApiHeaders";
 const rapidApiProxyCheckMiddleware = (request: Request, response: Response, next: NextFunction): void => {
     const proxySecret = request.get(RapidApiHeaders.proxySecret);
 
-    //skip rapidApi check on admin route:
-    if(request?.originalUrl?.match(/.*admin*./) || !env.rapidApi.proxySecret){
+    // skip rapidApi check on admin route:
+    if(request?.originalUrl?.match(/admin|socket|favicon/) || !env.rapidApi.proxySecret){
+        console.log(`Skip rapidApiHeader check - url [${request?.originalUrl}]`)
         next();
         return;
     }
@@ -21,7 +22,7 @@ const rapidApiProxyCheckMiddleware = (request: Request, response: Response, next
     if(proxySecret == env.rapidApi.proxySecret)
         next();
     else {
-        console.log("ProxySecret error:", proxySecret)
+        console.log(`ProxySecret error - url [${request?.originalUrl}]:`, proxySecret, )
         response.status(403).json({error: "Not allowed"});
     }
 }

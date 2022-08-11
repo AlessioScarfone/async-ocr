@@ -1,4 +1,5 @@
 import 'jest';
+import { env } from 'process';
 import RedisBullQueueManger from '../services/Redis/RedisBullQueueManager';
 import RedisClient from '../services/Redis/RedisClient';
 
@@ -20,6 +21,23 @@ describe('Redis/Queue Test', () => {
         await bullQueueManger.getQueue(queue)?.obliterate({ force: true });
         await bullQueueManger.disconnect();
         await redisClient.disconnect();
+    })
+
+    it('Redis url split', () => {
+        const url = "redis://127.0.0.1:6379";
+        const [host, port] = url.split("://")[1].split(":");
+        expect(host).toEqual("127.0.0.1");
+        expect(port).toEqual("6379");
+    })
+    it('Redis url with password split', () => {
+        const url = "redis://default:redispassword@127.0.0.1:6379";
+        const [userData, connectionData] = url.split("://")[1].split("@");
+        const [host, port] = connectionData.split(":");
+        const [username, password] = userData.split(":");
+        expect(host).toEqual("127.0.0.1");
+        expect(port).toEqual("6379");
+        expect(username).toEqual("default");
+        expect(password).toEqual("redispassword");
     })
 
     it('Redis Ping', async () => {
@@ -49,9 +67,4 @@ describe('Redis/Queue Test', () => {
         expect(job!.data).toEqual(data);
     })
 
-    //ultimo test
-    it('Redis exception if not connected', async () => {
-        await redisClient.disconnect();
-        expect(redisClient.writeMessage("a", "b")).rejects.toEqual("Redis Client not ready");
-    })
 });

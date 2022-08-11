@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import express, { Express, Request, Response } from "express";
 import compression from "compression";
 import cors from "cors";
@@ -12,6 +13,7 @@ import loadSwaggerPage from "./loaders/loadSwaggerPage";
 import env from "./config/env";
 import { rapidApiProxyCheckMiddleware } from "./middlewares/rapidApiProxyCheck.middleware";
 import RapidApiHeaders from "./models/RepidApiHeaders";
+import loadMorganLogger from "./loaders/loadMorganLogger";
 
 let bullMonitorConfiguredEsit = false;
 let swaggerConfiguredEsit = false;
@@ -22,27 +24,24 @@ const EXPRESS_CONTEXT_KEY = {
 }
 
 const loadExpressMiddleware = (app: Express) => {
-  loadMonitorPage(app)
-  bullMonitorConfiguredEsit = loadBullMonitorPage(app)
-  
   loadHelmetMiddleware(app);
+  
   app.use(cors());
-  app.use(requestIDMiddleware());
   app.use(compression());
-  app.use(express.text());
+  // app.use(express.text());
   app.use(express.json());
+
+  //Setup log
+  loadMorganLogger(app);
+
+  //Custom middlewares
+  app.use(requestIDMiddleware());
+  app.use(rapidApiProxyCheckMiddleware);
   app.use(errorHandlerMiddleware);
 
-  app.use(rapidApiProxyCheckMiddleware)
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  morgan.token('body', (req: Request, res: Response): string => JSON.stringify(req.body));
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  morgan.token('requestID', (req: Request, res: Response): string => req.requestID);
-  morgan.token('rapidApiUser', (req: Request, res: Response): string => req.get(RapidApiHeaders.user) || "MissingUser");
-  morgan.token('rapidApiSubscription', (req: Request, res: Response): string => req.get(RapidApiHeaders.subscription) || "MissingPlan");
-  app.use(morgan('[:date[clf]] :method :url :status [:requestID] [:rapidApiUser ; :rapidApiSubscription] :response-time ms - body = :body'));
-
+  //Admin Utils
+  loadMonitorPage(app)
+  bullMonitorConfiguredEsit = loadBullMonitorPage(app);
   swaggerConfiguredEsit = loadSwaggerPage(app);
 }
 

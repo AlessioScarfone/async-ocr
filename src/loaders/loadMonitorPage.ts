@@ -1,12 +1,14 @@
 import { Express } from "express";
 import env from "../config/env";
-import { nanoid } from "nanoid";
 import monitor from 'express-status-monitor';
 import monitorConfig from "../config/monitor.config";
 import expressBasicAuth from "express-basic-auth";
+import { getAdminBasicAuthConfig } from "../config/basicAuth";
 
 const loadMonitorPage = (app: Express): boolean => {
-    if (env.monitor.enabled && env.monitor.user && env.monitor.page && env.monitor.password) {
+    const basicAuthConfig = getAdminBasicAuthConfig();
+
+    if (env.monitor.enabled && env.monitor.page) {
         const statusMonitor = monitor(monitorConfig([
             {
                 protocol: 'http',
@@ -17,18 +19,10 @@ const loadMonitorPage = (app: Express): boolean => {
         ], ''));
         app.use((statusMonitor as any).middleware); // use the "middleware only" property to manage websockets
 
-        const users: { [key: string]: string } = {
-            [env.monitor.user]: env.monitor.password
-        }
-
-        const realm = nanoid();
-        // console.log("STATUS PAGE - realm: " + realm);
-        app.get(`${env.monitor.page}`, expressBasicAuth({
-            users,
-            challenge: true,
-            realm
-        }), (statusMonitor as any).pageRoute); // use the pageRoute property to serve the dashboard html page
-        // app.use(monitor(monitorConfig(PORT, '/status')));
+        if(basicAuthConfig)
+            app.get(`${env.monitor.page}`, expressBasicAuth(basicAuthConfig), (statusMonitor as any).pageRoute); // use the pageRoute property to serve the dashboard html page
+        else
+            app.get(`${env.monitor.page}`, (statusMonitor as any).pageRoute); // use the pageRoute property to serve the dashboard html page
 
         console.log(">> Monitor configured <<")
         return true;
