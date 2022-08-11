@@ -14,7 +14,7 @@ const rapidApiProxyCheckMiddleware = (request: Request, response: Response, next
 
     // skip rapidApi check on admin route:
     if(request?.originalUrl?.match(/admin|socket|favicon/) || !env.rapidApi.proxySecret){
-        console.log(`Skip rapidApiHeader check - url [${request?.originalUrl}]`)
+        // console.log(`Skip rapidApiHeader check - url [${request?.originalUrl}]`)
         next();
         return;
     }

@@ -8,7 +8,11 @@ const loadMorganLogger = (app: Express) => {
     morgan.token('requestID', (req: Request, res: Response): string => req.requestID);
     morgan.token('rapidApiUser', (req: Request, res: Response): string => req.get(RapidApiHeaders.user) || "MissingUser");
     morgan.token('rapidApiSubscription', (req: Request, res: Response): string => req.get(RapidApiHeaders.subscription) || "MissingPlan");
-    app.use(morgan('[:date[clf]] :method :url :status [:requestID] [:rapidApiUser;:rapidApiSubscription] :response-time ms - body = :body'));
+    app.use(morgan('[:date[clf]] :method :url :status [:requestID] [:rapidApiUser;:rapidApiSubscription] :response-time ms - body = :body', {
+        skip: (req, res) => {
+            return req.url.includes('health')
+        }
+    }));
 }
 
 export default loadMorganLogger;
