@@ -3,29 +3,32 @@ import { Express } from "express";
 import swaggerDocument from "../config/swagger/openapi.json";
 import swaggerUi from 'swagger-ui-express';
 import expressBasicAuth from "express-basic-auth";
-import { nanoid } from "nanoid";
 import env from "../config/env";
+import { getAdminBasicAuthConfig } from "../config/basicAuth";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require('../../package.json');
 
 const loadSwaggerPage = (app: Express): boolean => {
-    if (env.swagger.enabled && env.swagger.page && env.swagger.user && env.swagger.password) {
+
+    const basicAuthConfig = getAdminBasicAuthConfig();
+
+    if (env.swagger.enabled && env.swagger.page) {
         updateDynamicSwaggerValue(swaggerDocument);
 
-        const users: { [key: string]: string } = {
-            [env.swagger.user]: env.swagger.password
+        if (basicAuthConfig) {
+            app.use(
+                env.swagger.page,
+                expressBasicAuth(basicAuthConfig),
+                swaggerUi.serve,
+                swaggerUi.setup(swaggerDocument)
+            );
+        } else {
+            app.use(
+                env.swagger.page,
+                swaggerUi.serve,
+                swaggerUi.setup(swaggerDocument)
+            );
         }
-
-        app.use(
-            env.swagger.page,
-            expressBasicAuth({
-                users,
-                challenge: true,
-                realm: nanoid()
-            }),
-            swaggerUi.serve,
-            swaggerUi.setup(swaggerDocument)
-        );
         console.log(">> Swagger configured <<")
         return true;
     } else {

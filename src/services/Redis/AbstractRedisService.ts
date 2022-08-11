@@ -25,8 +25,8 @@ export default abstract class AbstractRedisService {
             this.ready = true;
         });
 
-        client.on('error', () => {
-            console.log(`>> Redis Client [${this.label}] : error <<`);
+        client.on('error', (error) => {
+            console.log(`>> Redis Client [${this.label}] : error <<`, error);
             this.ready = false;
             this.connected = false;
         });

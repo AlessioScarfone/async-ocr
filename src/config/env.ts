@@ -33,21 +33,19 @@ const env = {
     monitor: {
         enabled: toBool(process.env.MONITOR_ENABLED),
         page: process.env.MONITOR_ROUTE,
-        user: process.env.MONITOR_USERNAME,
-        password: process.env.MONITOR_PASSWORD,
     },
     bullMonitor: {
         enabled: toBool(process.env.BULL_MONITOR_ENABLED),
         page: process.env.BULL_MONITOR_ROUTE,
-        user: process.env.BULL_MONITOR_USERNAME,
-        password: process.env.BULL_MONITOR_PASSWORD,
     },
     swagger: {
         enabled: toBool(process.env.SWAGGER_ENABLED),
         page: process.env.SWAGGER_ROUTE,
-        user: process.env.SWAGGER_USERNAME,
-        password: process.env.SWAGGER_PASSWORD,
         showAdminSection: toBool(process.env.SWAGGER_SHOW_ADMIN_SECTION)
+    },
+    admin: {
+        user: process.env.ADMIN_USERNAME || "admin",
+        password: process.env.ADMIN_PASSWORD
     },
     rapidApi: {
         proxySecret: process.env.RAPID_API_PROXY_SECRET

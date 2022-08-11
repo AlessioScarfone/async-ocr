@@ -4,11 +4,14 @@ import { BullAdapter } from '@bull-board/api/bullAdapter';
 import { Express } from "express";
 import env from "../config/env";
 import expressBasicAuth from "express-basic-auth";
-import { nanoid } from "nanoid";
 import RedisBullQueueManger from "../services/Redis/RedisBullQueueManager";
+import { getAdminBasicAuthConfig } from "../config/basicAuth";
 
 const loadBullMonitorPage = (app: Express): boolean => {
-    if (env.bullMonitor.enabled && env.bullMonitor.page && env.bullMonitor.user && env.bullMonitor.password) {
+
+    const basicAuthConfig = getAdminBasicAuthConfig();
+
+    if (env.bullMonitor.enabled && env.bullMonitor.page) {
         const serverAdapter = new ExpressAdapter();
         serverAdapter.setBasePath(env.bullMonitor.page);
 
@@ -22,15 +25,11 @@ const loadBullMonitorPage = (app: Express): boolean => {
             serverAdapter
         })
 
-        const users: { [key: string]: string } = {
-            [env.bullMonitor.user]: env.bullMonitor.password
-        }
+        if(basicAuthConfig)
+            app.use(env.bullMonitor.page, expressBasicAuth(basicAuthConfig), serverAdapter.getRouter());
+        else
+            app.use(env.bullMonitor.page, serverAdapter.getRouter());
 
-        app.use(env.bullMonitor.page, expressBasicAuth({
-            users,
-            challenge: true,
-            realm: nanoid()
-        }), serverAdapter.getRouter());
         console.log(">> Bull Monitor configured <<")
         return true;
     } else {
