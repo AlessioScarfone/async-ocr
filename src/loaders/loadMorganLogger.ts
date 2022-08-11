@@ -10,7 +10,7 @@ const loadMorganLogger = (app: Express) => {
     morgan.token('rapidApiSubscription', (req: Request, res: Response): string => req.get(RapidApiHeaders.subscription) || "MissingPlan");
     app.use(morgan('[:date[clf]] :method :url :status [:requestID] [:rapidApiUser;:rapidApiSubscription] :response-time ms - body = :body', {
         skip: (req, res) => {
-            return req.url.includes('health')
+            return req.url.includes('admin')
         }
     }));
 }
