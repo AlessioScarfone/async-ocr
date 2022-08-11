@@ -25,6 +25,12 @@ Asynchronous REST OCR API.
 - `start-prod` : run locally on production mode
 - `test` : run test
 - `build` : build project
+- `prod` : run in production and load env vars from deployment environment
+
+## Docker
+- `docker-build` : build docker image
+- `docker-run-dev` : locally run api and redis (without password)
+
 
 ## Install and run Redis via Docker
 
