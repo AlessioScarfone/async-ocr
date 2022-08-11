@@ -42,7 +42,7 @@ const env = {
     swagger: {
         enabled: toBool(process.env.SWAGGER_ENABLED),
         page: process.env.SWAGGER_ROUTE || "/admin/api-docs",
-        showAdminSection: toBool(process.env.SWAGGER_SHOW_ADMIN_SECTION)
+        showAdminSection: toBool(process.env.SWAGGER_SHOW_ADMIN_SECTION) || false
     },
     admin: {
         user: process.env.ADMIN_USERNAME || "admin",
