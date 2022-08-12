@@ -4,7 +4,7 @@
   "description": "Async OCR",
   "main": "server.js",
   "scripts": {
-    "start-dev": "npm run clear && nodemon -r dotenv/config --watch src src/index.ts dotenv_config_path=.env",
+    "start-dev": "nodemon -r dotenv/config --watch src src/index.ts dotenv_config_path=.env",
     "start-dev:log": "npm run start 2>&1| tee log.txt",
     
     "build": "rimraf dist && tsc --project tsconfig.build.json",
@@ -17,7 +17,6 @@
     "test": "jest --verbose=true --runInBand --detectOpenHandles --forceExit",
     "test:watch": "jest --watch",
     "lint": "eslint src",
-    "clear": "rimraf log*.txt *traineddata",
     
     "docker-build": "docker build -t async-ocr --progress=plain .",
     "docker-run-dev": "docker-compose up"

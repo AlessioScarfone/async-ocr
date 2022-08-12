@@ -49,7 +49,7 @@ class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
                     throw new Error("lang '" + input.lang + "' not supported")
 
                 const ocrResult = await Tesseract.recognize(input?.url, input.lang, {
-                    gzip: true,
+                    gzip: false,
                     langPath: this.langPath,
                     errorHandler: (err) => {
                         const errorMessage = getErrorMessage(err);
