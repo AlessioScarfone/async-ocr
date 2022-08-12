@@ -54,8 +54,9 @@ class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
                     langPath: this.langPath,
                     errorHandler: (err) => {
                         const errorMessage = getErrorMessage(err);
-                        console.log(" !! Nested tesseract ERROR:", errorMessage, "; INPUT:", input)
-                    }
+                        console.log(" !! Tesseract Core ERROR:", errorMessage, "; INPUT:", input)
+                    },
+                    logger: m => console.log(":: Tesseract Core:", m)
                 });
                 const result: OCRWorkerOutput = {
                     confidence: ocrResult?.data?.confidence,
