@@ -12,9 +12,9 @@ const tesseractProcessorFactory = (redisClient: RedisClient): Queue.ProcessPromi
     const tesseractWorker: TesseractWorker = new TesseractWorker();
 
     return async (job: Job) => {
-        console.log("START JOB PROCESSOR", job?.id);
         const msg = job?.data as RedisRequestModel;
-        console.log(`Process job [${job?.id}] - Message: `, msg);
+        console.log(`Start Process job [${job?.id}] - Message: `, msg);
+        job.log("TeserractProcessor - Start");
 
         const input: OCRWorkerInput = {
             ...msg.value
@@ -36,7 +36,7 @@ const tesseractProcessorFactory = (redisClient: RedisClient): Queue.ProcessPromi
         }
         job.returnvalue = tesseractOutput
         console.log(`Process job [${job?.id}] - Result - id: [${msg.key}]`,  tesseractOutput);
-        job.log("Process complete; write result on redis: " + JSON.stringify(tesseractOutput));
+        job.log("TeserractProcessor - END; write result on redis: " + JSON.stringify(tesseractOutput));
         await redisClient.writeMessage(msg.key, tesseractOutput);
         await job.progress(100);
         return Promise.resolve();
