@@ -7,7 +7,7 @@
     "start-dev": "nodemon -r dotenv/config --watch src src/index.ts dotenv_config_path=.env",
     "start-dev:log": "npm run start 2>&1| tee log.txt",
     "build": "rimraf dist && tsc --project tsconfig.build.json",
-    "postbuild": "ncp \"src/services/Tesseract/lang\" \"dist/..\"",
+    "postbuild": "ncp \"src/services/Tesseract/lang\" \"dist/..\" && ncp \"src/services/Tesseract/lang\" \"dist/services/Tesseract/lang\"",
     "start-prod": "node -r dotenv/config dist/index.js dotenv_config_path=.env.prod",
     "prod": "node dist/index.js",
     "test": "jest --verbose=true --runInBand --detectOpenHandles --forceExit",

@@ -25,7 +25,12 @@ const EXPRESS_CONTEXT_KEY = {
 
 const loadExpressMiddleware = (app: Express) => {
   loadHelmetMiddleware(app);
-  
+
+  //Admin Utils
+  loadMonitorPage(app)
+  bullMonitorConfiguredEsit = loadBullMonitorPage(app);
+  swaggerConfiguredEsit = loadSwaggerPage(app);
+
   app.use(cors());
   app.use(compression());
   // app.use(express.text());
@@ -38,11 +43,6 @@ const loadExpressMiddleware = (app: Express) => {
   app.use(requestIDMiddleware());
   app.use(rapidApiProxyCheckMiddleware);
   app.use(errorHandlerMiddleware);
-
-  //Admin Utils
-  loadMonitorPage(app)
-  bullMonitorConfiguredEsit = loadBullMonitorPage(app);
-  swaggerConfiguredEsit = loadSwaggerPage(app);
 }
 
 const logRegisteredRoutes = (app: Express) => {
@@ -58,9 +58,9 @@ const logRegisteredRoutes = (app: Express) => {
     }
   }).flat(Infinity).filter((e: any) => e)
 
-  if(bullMonitorConfiguredEsit) 
+  if (bullMonitorConfiguredEsit)
     routes.push({ path: env.bullMonitor.page, methods: { get: true } })
-  if(swaggerConfiguredEsit) 
+  if (swaggerConfiguredEsit)
     routes.push({ path: env.swagger.page, methods: { get: true } })
   console.log(routes);
   console.log("=====================================\n")

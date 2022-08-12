@@ -33,6 +33,7 @@ class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
     }
 
     public async process(input: OCRWorkerInput) {
+        console.log("TesseractWorker#process Start:", input)
         if (input.url && input.lang) {
             // await this.init();
             // const ocrResult = await this.worker.recognize(input?.imgUrl);
