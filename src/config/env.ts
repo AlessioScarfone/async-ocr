@@ -19,6 +19,10 @@ function toNumber(value: string): number {
     return parseInt(value, 10);
 }
 
+export function isProd() {
+    return env.node_env === "production"
+}
+
 const env = {
     node_env: process.env.NODE_ENV || "production",
     port: process.env.PORT || 8080,
@@ -50,6 +54,9 @@ const env = {
     },
     rapidApi: {
         proxySecret: process.env.RAPID_API_PROXY_SECRET
+    },
+    log: {
+        tesseractCoreEnabled: toBool(process.env.LOG_TESSERACT_CORE_ENABLED)
     }
 }
 

@@ -1,14 +1,15 @@
 {
   "name": "async-ocr",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Async OCR",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
+    "prestart-dev": "ncp \"traineddata_lang\" \".\"",
     "start-dev": "nodemon -r dotenv/config --watch src src/index.ts dotenv_config_path=.env",
     "start-dev:log": "npm run start 2>&1| tee log.txt",
-    "build": "rimraf dist && tsc --project tsconfig.build.json",
-    "postbuild": "ncp \"src/services/Tesseract/lang\" \"dist/..\" && ncp \"src/services/Tesseract/lang\" \"dist/services/Tesseract/lang\"",
     "start-prod": "node -r dotenv/config dist/index.js dotenv_config_path=.env.prod",
+    "build": "rimraf dist && tsc --project tsconfig.build.json",
+    "postbuild": "ncp \"traineddata_lang\" \"dist\"",
     "prod": "node dist/index.js",
     "test": "jest --verbose=true --runInBand --detectOpenHandles --forceExit",
     "test:watch": "jest --watch",
@@ -74,6 +75,6 @@
     "rsmq": "^0.12.4",
     "rsmq-worker": "^0.5.2",
     "swagger-ui-express": "^4.5.0",
-    "tesseract.js": "^2.1.5"
+    "tesseract.js": "^3.0.1"
   }
 }

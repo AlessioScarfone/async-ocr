@@ -1,10 +1,9 @@
 import Queue, { JobOptions } from "bull";
-import env from "../../config/env";
 import RedisConnectionOption from "../../config/redisConnection";
 
 const DEFAULT_QUEUE_OPTS: JobOptions = {
-    // removeOnComplete: true,  //remove all completed job
-    removeOnComplete: 50, //preserve last 50 job in completed queue
+    removeOnComplete: true,  //remove all completed job
+    // removeOnComplete: 50, //preserve last 50 job in completed queue
     attempts: 2,
     backoff: 10000
 }

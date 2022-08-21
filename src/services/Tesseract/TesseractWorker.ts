@@ -1,5 +1,6 @@
 import path from "path";
 import Tesseract from "tesseract.js";
+import env from "../../config/env";
 import { getErrorMessage } from "../../models/Error";
 import IProcessor from "../../models/IProcessor";
 import { OCRWorkerInput } from "./OCRWorkerInput";
@@ -12,7 +13,9 @@ class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
 
     constructor(langPath?: string) {
 
-        this.langPath = langPath || path.join(__dirname, 'lang');
+        // this.langPath = langPath || path.join(__dirname, 'lang');
+        //Lang traindata in root folder
+        this.langPath = langPath || path.join(__dirname, '..','..','..');
         console.log("TesseractProcessor created:", { langPath: this.langPath })
     }
 
@@ -33,7 +36,9 @@ class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
     }
 
     public async process(input: OCRWorkerInput) {
-        console.log("TesseractWorker#process Start:", input)
+        console.log("TesseractWorker#process Start:", input);
+        const timerId= "process time [" + input.lang + " - " + input.url + "]";
+        console.time(timerId)
         if (input.url && input.lang) {
             // await this.init();
             // const ocrResult = await this.worker.recognize(input?.imgUrl);
@@ -56,12 +61,16 @@ class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
                         const errorMessage = getErrorMessage(err);
                         console.log(" !! Tesseract Core ERROR:", errorMessage, "; INPUT:", input)
                     },
-                    logger: m => console.log(":: Tesseract Core:", m)
+                    logger: m => {
+                        if (env.log.tesseractCoreEnabled)
+                            console.log(":: Tesseract Core:", m)
+                    }
                 });
                 const result: OCRWorkerOutput = {
                     confidence: ocrResult?.data?.confidence,
                     text: ocrResult?.data?.text
                 }
+                console.timeEnd(timerId)
                 return result;
             } catch (err) {
                 const errorMessage = getErrorMessage(err);
