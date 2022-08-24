@@ -32,13 +32,13 @@ describe('TesseractProcessor Client', () => {
     });
 
     it("process image by url (1)", async () => {
-        const res = await processor.process({ url: testImg1.url, lang: 'eng' });
+        const res = await processor.process({ img: testImg1.url, lang: 'eng', isFile: false });
         expect(res?.confidence).not.toBeNull();
         expect(res?.text).toEqual(testImg1.result);
     })
 
     it("process image by url (2)", async () => {
-        const res = await processor.process({ url: testImg2.url, lang: 'eng' });
+        const res = await processor.process({ img: testImg2.url, lang: 'eng', isFile: false });
         expect(res?.confidence).not.toBeNull();
         expect(res?.text).toEqual(testImg2.result);
     })
@@ -46,11 +46,13 @@ describe('TesseractProcessor Client', () => {
     it.skip("Multiple process image by url (1) - 10 iterations", async () => {
         const iterations = 10;
         for (let i = 0; i < iterations; i++) {
-            const res = await processor.process({ url: testImg1.url, lang: 'eng' });
+            const res = await processor.process({ img: testImg1.url, lang: 'eng', isFile: false });
             expect(res?.confidence).not.toBeNull();
             expect(res?.text).toEqual(testImg1.result);
             console.log("Done: " + i + "/" + iterations)
         }
     })
+
+    //TODO: add test with file
 
 })
