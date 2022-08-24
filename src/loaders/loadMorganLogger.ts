@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Express, Request, Response } from "express";
 import morgan from "morgan";
-import RapidApiHeaders from "../models/RepidApiHeaders";
+import RapidApiHeaders from "../models/RapidApiHeaders";
 
 const loadMorganLogger = (app: Express) => {
     morgan.token('body', (req: Request, res: Response): string => JSON.stringify(req.body));

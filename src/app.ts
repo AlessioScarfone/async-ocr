@@ -12,7 +12,7 @@ import loadBullMonitorPage from "./loaders/loadBullMonitorPage";
 import loadSwaggerPage from "./loaders/loadSwaggerPage";
 import env from "./config/env";
 import { rapidApiProxyCheckMiddleware } from "./middlewares/rapidApiProxyCheck.middleware";
-import RapidApiHeaders from "./models/RepidApiHeaders";
+import RapidApiHeaders from "./models/RapidApiHeaders";
 import loadMorganLogger from "./loaders/loadMorganLogger";
 
 let bullMonitorConfiguredEsit = false;
