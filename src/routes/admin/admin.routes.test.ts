@@ -18,12 +18,38 @@ describe('Admin Router tests', () => {
 
     it('can open status page', async () => {
         // console.log(env.monitor);
-        if (env.monitor.enabled && env.monitor.page && env.monitor.password && env.monitor.user) {
+        if (env.monitor.enabled && env.monitor.page) {
             const response = await request(app)
                 .get(`${env.monitor.page}`)
-                .auth(env.monitor.user, env.monitor.password);
+                .auth(env.admin.user, env.admin.password || "");
 
             expect(response.statusCode).toBe(200);
+        } else {
+            console.log('TEST (can open status page): Status page not available');
+        }
+    })
+
+    it('can open bull monitor page', async () => {
+        // console.log(env.monitor);
+        if (env.bullMonitor.enabled && env.bullMonitor.page) {
+            const response = await request(app)
+                .get(`${env.bullMonitor.page}`)
+                .auth(env.admin.user, env.admin.password || "");
+
+            expect(response.statusCode).toBe(200);
+        } else {
+            console.log('TEST (can open status page): Status page not available');
+        }
+    })
+
+    it('can open swagger page', async () => {
+        // console.log(env.monitor);
+        if (env.swagger.enabled && env.swagger.page) {
+            const response = await request(app)
+                .get(`${env.swagger.page}`)
+                .auth(env.admin.user, env.admin.password || "");
+
+            expect(response.statusCode === 200 || response.statusCode === 301).toBeTruthy()
         } else {
             console.log('TEST (can open status page): Status page not available');
         }

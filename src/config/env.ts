@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 function toBool(value: string | undefined | null): boolean {
     return value === 'true';
 }

@@ -2,12 +2,12 @@ import path from "path";
 import Tesseract from "tesseract.js";
 import env from "../../config/env";
 import { getErrorMessage } from "../../models/Error";
-import IProcessor from "../../models/IProcessor";
+import IWorker from "../../models/IWorker";
 import { OCRWorkerInput } from "./OCRWorkerInput";
 import { OCRWorkerOutput } from "./OCRWorkerOutput";
 import { ACCEPTED_LANGUAGE } from "./TesseractTypes";
 
-class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
+class TesseractWorker implements IWorker<OCRWorkerInput, OCRWorkerOutput> {
     private langPath: string;
     private worker!: Tesseract.Worker;
 
@@ -39,9 +39,10 @@ class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
         console.log("TesseractWorker#process Start:", { 
             lang: input.lang, 
             img: typeof input?.img === 'string' ? input?.img : '< Buffer >', 
-            isFile: input.isFile 
+            isFile: input.isFile,
+            requestId: input.requestId
         });
-        const timerId= "process time [" + input.lang + " - " + input.img + "]";
+        const timerId= "process time [" + input.lang + " - " + input.requestId + "]";
         console.time(timerId)
         if (input.img && input.lang) {
             // await this.init();

@@ -1,9 +1,11 @@
+import { readFileSync } from 'fs';
 import 'jest'
-import TesseractWorker from '../services/Tesseract/TesseractWorker'
+import path from 'path';
+import TesseractWorker, { OCRWorkerInput } from '../services/Tesseract/TesseractWorker'
 jest.setTimeout(15000);
 
 describe('TesseractProcessor Client', () => {
-    let processor: TesseractWorker;
+    let worker: TesseractWorker;
     const testImg1 = {
         url: "https://tesseract.projectnaptha.com/img/eng_bw.png",
         lang: 'eng',
@@ -28,17 +30,17 @@ describe('TesseractProcessor Client', () => {
     }
 
     beforeAll(async () => {
-        processor = new TesseractWorker('eng');
+        worker = new TesseractWorker('eng');
     });
 
     it("process image by url (1)", async () => {
-        const res = await processor.process({ img: testImg1.url, lang: 'eng', isFile: false });
+        const res = await worker.process(new OCRWorkerInput(testImg1.url, 'eng', false));
         expect(res?.confidence).not.toBeNull();
         expect(res?.text).toEqual(testImg1.result);
     })
 
     it("process image by url (2)", async () => {
-        const res = await processor.process({ img: testImg2.url, lang: 'eng', isFile: false });
+        const res = await worker.process(new OCRWorkerInput(testImg2.url, 'eng', false));
         expect(res?.confidence).not.toBeNull();
         expect(res?.text).toEqual(testImg2.result);
     })
@@ -46,13 +48,17 @@ describe('TesseractProcessor Client', () => {
     it.skip("Multiple process image by url (1) - 10 iterations", async () => {
         const iterations = 10;
         for (let i = 0; i < iterations; i++) {
-            const res = await processor.process({ img: testImg1.url, lang: 'eng', isFile: false });
+            const res = await worker.process(new OCRWorkerInput(testImg1.url, 'eng', false));
             expect(res?.confidence).not.toBeNull();
             expect(res?.text).toEqual(testImg1.result);
             console.log("Done: " + i + "/" + iterations)
         }
     })
 
-    //TODO: add test with file
-
+    it("process image from file", async () => {
+        const buf = readFileSync(path.join(__dirname, "assets/eng_bw.png"));
+        const res = await worker.process(new OCRWorkerInput(buf, 'eng', true));
+        expect(res?.confidence).not.toBeNull();
+        expect(res?.text).toEqual(testImg1.result);
+    })
 })

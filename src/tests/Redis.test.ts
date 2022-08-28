@@ -1,5 +1,4 @@
 import 'jest';
-import { env } from 'process';
 import RedisBullQueueManger from '../services/Redis/RedisBullQueueManager';
 import RedisClient from '../services/Redis/RedisClient';
 

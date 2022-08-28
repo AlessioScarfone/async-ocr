@@ -47,7 +47,7 @@ ocrRouter.post(`${baseUrl}/recognition`,
 
         const redisQueueWriter = request.app.get(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER) as RedisBullQueueManger;
         try {
-            const OCRInput = new OCRWorkerInput(url, lang, false);
+            const OCRInput = new OCRWorkerInput(url, lang, false, requestID);
             const redisMsg: RedisRequestModel = {
                 key: requestID,
                 value: OCRInput
@@ -91,7 +91,7 @@ ocrRouter.post(`${baseUrl}/recognition/file`,
         const redisQueueWriter = request.app.get(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER) as RedisBullQueueManger;
         try {
             if (file?.buffer) {
-                const OCRInput = new OCRWorkerInput(file.buffer, lang, true);
+                const OCRInput = new OCRWorkerInput(file.buffer, lang, true, requestID);
                 const redisMsg: RedisRequestModel = {
                     key: requestID,
                     value: OCRInput
