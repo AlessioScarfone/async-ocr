@@ -12,47 +12,37 @@
   ],
   "tags": [
     {
-      "name": "OCR",
-      "description": "Extract Text From an Image"
+      "name": "OCR Insert Request",
+      "description": "Insert text extraction request"
     },
     {
-      "name": "Admin",
-      "description": "Administration utilities"
+      "name": "OCR Retrieve Result",
+      "description": "Get text extraction request"
     }
   ],
   "paths": {
-    "/admin/health": {
-      "get": {
-        "tags": [
-          "Admin"
-        ],
-        "summary": "server health check",
-        "responses": {
-          "200": {
-            "description": "Server available",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Status"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/ocr/recognition": {
+    "/ocr/recognition/file": {
       "post": {
         "tags": [
-          "OCR"
+          "OCR Insert Request"
         ],
         "summary": "ask for text extraction",
         "requestBody": {
           "description": "Enter request to extract text from the image",
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/RecognizeRequest"
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "lang": {
+                    "type": "string",
+                    "example": "eng"
+                  }
+                }
               }
             }
           }
@@ -84,7 +74,7 @@
     "/ocr/recognition/result": {
       "get": {
         "tags": [
-          "OCR"
+          "OCR Retrieve Result"
         ],
         "summary": "retrive text extraction result",
         "parameters": [
@@ -145,35 +135,11 @@
   },
   "components": {
     "schemas": {
-      "Status": {
+      "RecognizeResponse": {
         "type": "object",
         "properties": {
-          "uptime": {
-            "type": "number",
-            "format": "float"
-          },
-          "message": {
-            "type": "string",
-            "enum": [
-              "ok"
-            ]
-          },
-          "timestamp": {
-            "type": "number"
-          }
-        },
-        "example": {
-          "uptime": 74.820424875,
-          "message": "ok",
-          "timestamp": 1660058349818
-        }
-      },
-      "RecognizeRequest": {
-        "type": "object",
-        "properties": {
-          "url": {
-            "type": "string",
-            "format": "uri"
+          "id": {
+            "type": "string"
           },
           "lang": {
             "type": "string",
@@ -183,27 +149,7 @@
           }
         },
         "example": {
-          "url": "https://mysite/img.png",
-          "lang": "eng"
-        }
-      },
-      "RecognizeResponse": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/RecognizeRequest"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "example": {
           "id": "YioXNGsgXoJSCshxUo_K8",
-          "url": "https://mysite/loremIpsumImg.png",
           "lang": "eng"
         }
       },
