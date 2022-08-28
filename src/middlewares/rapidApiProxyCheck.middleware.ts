@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import env from "../config/env";
-import RapidApiHeaders from "../models/RepidApiHeaders";
+import RapidApiHeaders from "../models/RapidApiHeaders";
 
 /**
  * Express middleware that block all request without correct X-RapidAPI-Proxy-Secret header

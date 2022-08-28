@@ -2,12 +2,12 @@ import path from "path";
 import Tesseract from "tesseract.js";
 import env from "../../config/env";
 import { getErrorMessage } from "../../models/Error";
-import IProcessor from "../../models/IProcessor";
+import IWorker from "../../models/IWorker";
 import { OCRWorkerInput } from "./OCRWorkerInput";
 import { OCRWorkerOutput } from "./OCRWorkerOutput";
 import { ACCEPTED_LANGUAGE } from "./TesseractTypes";
 
-class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
+class TesseractWorker implements IWorker<OCRWorkerInput, OCRWorkerOutput> {
     private langPath: string;
     private worker!: Tesseract.Worker;
 
@@ -36,10 +36,15 @@ class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
     }
 
     public async process(input: OCRWorkerInput) {
-        console.log("TesseractWorker#process Start:", input);
-        const timerId= "process time [" + input.lang + " - " + input.url + "]";
+        console.log("TesseractWorker#process Start:", { 
+            lang: input.lang, 
+            img: typeof input?.img === 'string' ? input?.img : '< Buffer >', 
+            isFile: input.isFile,
+            requestId: input.requestId
+        });
+        const timerId= "process time [" + input.lang + " - " + input.requestId + "]";
         console.time(timerId)
-        if (input.url && input.lang) {
+        if (input.img && input.lang) {
             // await this.init();
             // const ocrResult = await this.worker.recognize(input?.imgUrl);
             // const result: TesseractProcessorOutput = {
@@ -53,8 +58,13 @@ class TesseractWorker implements IProcessor<OCRWorkerInput, OCRWorkerOutput> {
             try {
                 if (!ACCEPTED_LANGUAGE.includes(input.lang))
                     throw new Error("lang '" + input.lang + "' not supported")
+                
+                let inputImg = input.img;
+                if(input.isFile) {
+                    inputImg = Buffer.from(input.img);
+                }
 
-                const ocrResult = await Tesseract.recognize(input?.url, input.lang, {
+                const ocrResult = await Tesseract.recognize(inputImg, input.lang, {
                     gzip: false,
                     langPath: this.langPath,
                     errorHandler: (err) => {

@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: Async Rest OCR
+  description: Async REST OCR API
+  version: X.X.X
+servers:
+  - url: http://localhost:8080/api
+tags:
+  - name: OCR Insert Request
+    description: Insert text extraction request
+  - name: OCR Retrieve Result
+    description: Get text extraction request
+paths:
+  /ocr/recognition/file:
+    post:
+      tags:
+        - OCR Insert Request
+      summary: ask for text extraction
+      requestBody:
+        description: Enter request to extract text from the image
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                lang:
+                  type: string
+                  example: eng
+      responses:
+        '200':
+          description: The request has been accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognizeResponse'
+        '400':
+          description: Input not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /ocr/recognition/result:
+    get:
+      tags:
+        - OCR Retrieve Result
+      summary: retrive text extraction result
+      parameters:
+        - name: id
+          in: query
+          description: Request identifier
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Result found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OCRWorkerOutput'
+              examples:
+                success:
+                  value:
+                    confidence: 98
+                    text: lorem... ipsum..
+                fetch image error:
+                  value:
+                    error: 'reason: getaddrinfo ENOTFOUND mysite.com'
+        '404':
+          description: result found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OCRWorkerOutput'
+              examples:
+                not found error:
+                  value:
+                    error: NOT FOUND
+components:
+  schemas:
+    RecognizeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        lang:
+          type: string
+          enum:
+            - eng
+      example:
+        id: YioXNGsgXoJSCshxUo_K8
+        lang: eng
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+              msg:
+                type: string
+              param:
+                type: string
+              location:
+                type: string
+      example:
+        errors:
+          - value: egng
+            msg: Invalid Lang
+            param: lang
+            location: body
+    OCRWorkerOutput:
+      properties:
+        confidence:
+          type: number
+        text:
+          type: string
+        error:
+          type: string
+      example:
+        confidence: 98
+        text: lorem ipsum ...

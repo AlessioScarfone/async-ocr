@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 function toBool(value: string | undefined | null): boolean {
     return value === 'true';
 }
@@ -57,6 +59,9 @@ const env = {
     },
     log: {
         tesseractCoreEnabled: toBool(process.env.LOG_TESSERACT_CORE_ENABLED)
+    },
+    file: {
+        sizeLimit: toNumber(process.env.FILE_SIZE_LIMIT_BYTE ? process.env.FILE_SIZE_LIMIT_BYTE : "3000000")    //default 3MB
     }
 }
 
