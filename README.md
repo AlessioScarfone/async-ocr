@@ -9,6 +9,7 @@ Asynchronous REST OCR API.
 - Redis
 - Bull
 
+```mermaid
 sequenceDiagram
     actor User
     participant Server
@@ -32,6 +33,7 @@ sequenceDiagram
     RedisDB ->> Server: Get Result
     Server ->> User: Return text extraction result
     deactivate Server
+```
 
 ### Available endpoint
 
