@@ -20,14 +20,14 @@ sequenceDiagram
     User ->> Server: Insert text extraction request (in: File)
     activate Server
     Server ->> RedisQueue: Put in Redis Queue
-    Server ->> User: Return requestId
+    Server ->> User: Return "requestID"
     deactivate Server
     RedisQueue -->> OCRProcessor: Process Message
     activate OCRProcessor
     OCRProcessor ->> RedisDB: Insert result on Redis DB
     deactivate OCRProcessor
 
-    User ->> Server: Ask for result
+    User ->> Server: Ask for result (in: requestID)
     activate Server
     Server ->> RedisDB: Search result
     RedisDB ->> Server: Get result
