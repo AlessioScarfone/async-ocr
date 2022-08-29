@@ -1,6 +1,6 @@
 # Async OCR
 <p align="center">
-Asynchronous REST OCR API.
+Asynchronous REST OCR API
 </p>
 
 ## Architecture
@@ -37,15 +37,11 @@ sequenceDiagram
 
 ### Available endpoint
 
-POST /api/ocr/recognition/file
+**POST** `/api/ocr/recognition/file`
 > Insert request for text extraction
 
-GET /api/ocr/recognition/result
+**GET** `/api/ocr/recognition/result`
 > Get result of text extraction
-
-### Example
-
-> TODO:
 
 ## Script
 
