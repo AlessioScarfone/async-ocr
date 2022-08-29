@@ -9,11 +9,37 @@ Asynchronous REST OCR API.
 - Redis
 - Bull
 
-> TODO: add process schema
+sequenceDiagram
+    actor User
+    participant Server
+    participant OCRProcessor
+    participant RedisQueue
+    participant RedisDB
+
+    User ->> Server: Insert text extraction request (in: File)
+    activate Server
+    Server ->> RedisQueue: Put in Redis Queue
+    Server ->> User: Return requestId
+    deactivate Server
+    RedisQueue -->> OCRProcessor: Process Message
+    activate OCRProcessor
+    OCRProcessor ->> RedisDB: Insert result on Redis DB
+    deactivate OCRProcessor
+
+    User ->> Server: Ask for result
+    activate Server
+    Server ->> RedisDB: Search result
+    RedisDB ->> Server: Get Result
+    Server ->> User: Return text extraction result
+    deactivate Server
 
 ### Available endpoint
 
-> TODO:
+POST /api/ocr/recognition/file
+> Insert request for text extraction
+
+GET /api/ocr/recognition/result
+> Get result of text extraction
 
 ### Example
 
