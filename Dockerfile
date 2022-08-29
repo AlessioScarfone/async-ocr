@@ -10,6 +10,8 @@ COPY . .
 
 RUN npm run build
 
+RUN cp traineddata_lang/* .
+
 RUN npm prune --production
 
 RUN rm -rf src traineddata_lang package-lock.json tsconfig.build.json tsconfig.json

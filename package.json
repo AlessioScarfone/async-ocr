@@ -9,7 +9,6 @@
     "start-dev:log": "npm run start 2>&1| tee log.txt",
     "start-prod": "node -r dotenv/config dist/index.js dotenv_config_path=.env.prod",
     "build": "rimraf dist && tsc --project tsconfig.build.json",
-    "postbuild": "ncp \"traineddata_lang\" \"dist\"",
     "prod": "node dist/index.js",
     "test": "jest --verbose=true --runInBand --detectOpenHandles --forceExit",
     "test:watch": "jest --watch",
