@@ -30,7 +30,7 @@ sequenceDiagram
     User ->> Server: Ask for result
     activate Server
     Server ->> RedisDB: Search result
-    RedisDB ->> Server: Get Result
+    RedisDB ->> Server: Get result
     Server ->> User: Return text extraction result
     deactivate Server
 ```
