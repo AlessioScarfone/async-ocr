@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { body, check, query, validationResult } from "express-validator";
 import { EXPRESS_CONTEXT_KEY } from "../../app";
-import env from "../../config/env";
+import env, { isProd } from "../../config/env";
 import RedisRequestModel from "../../models/RedisRequest.model";
 import RedisBullQueueManger from "../../services/Redis/RedisBullQueueManager";
 import RedisClient from "../../services/Redis/RedisClient";
@@ -21,46 +21,48 @@ const upload = multer();
 const fileField = 'file';
 
 /**
- * Ask for OCR recognition
+ * Ask for OCR recognition with file url
  * Params:
  * - url: string
  * - lang: string
  */
-ocrRouter.post(`${baseUrl}/recognition`,
-    body('url')
-        .exists().bail()
-        .isURL({ protocols: ['https', 'http'] }).bail()
-        .withMessage('Invalid URL')
-        .matches(/^.*(bmp|jpg|png)$/).withMessage('Image extension not supported. (Supported format: bmp, jpg, png)'),
-    body('lang').exists().isString().isIn(ACCEPTED_LANGUAGE).withMessage('Invalid Lang'),
-    async (request: Request, response: Response) => {
-        // ==== START: input validation ===
-        const errors = validationResult(request);
-        const requestID = request.requestID;
-        if (!errors.isEmpty()) {
-            console.log(`Error : [${requestID}]`, errors.array());
-            return response.status(400).json({ errors: errors.array() });
-        }
-        // ==== END: input validation ===
+if (!isProd()) {
+    ocrRouter.post(`${baseUrl}/recognition`,
+        body('url')
+            .exists().bail()
+            .isURL({ protocols: ['https', 'http'] }).bail()
+            .withMessage('Invalid URL')
+            .matches(/^.*(bmp|jpg|png)$/).withMessage('Image extension not supported. (Supported format: bmp, jpg, png)'),
+        body('lang').exists().isString().isIn(ACCEPTED_LANGUAGE).withMessage('Invalid Lang'),
+        async (request: Request, response: Response) => {
+            // ==== START: input validation ===
+            const errors = validationResult(request);
+            const requestID = request.requestID;
+            if (!errors.isEmpty()) {
+                console.log(`Error : [${requestID}]`, errors.array());
+                return response.status(400).json({ errors: errors.array() });
+            }
+            // ==== END: input validation ===
 
-        const { url, lang } = request.body;
+            const { url, lang } = request.body;
 
-        const redisQueueWriter = request.app.get(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER) as RedisBullQueueManger;
-        try {
-            const OCRInput = new OCRWorkerInput(url, lang, false, requestID);
-            const redisMsg: RedisRequestModel = {
-                key: requestID,
-                value: OCRInput
-            };
-            const queueName = env.redis.queuePrefix + lang;
-            const queueJob = await redisQueueWriter.sendMessage(queueName, redisMsg);
-            console.log(`Job added to queue [${queueName}] - jobId = `, queueJob?.id);
-            response.status(200).json({ id: requestID, ...request.body });
-        } catch (err) {
-            console.error("recognize POST error: [" + requestID + "]: " + err)
-            response.status(500).json({ error: GENERIC_ERROR });
-        }
-    })
+            const redisQueueWriter = request.app.get(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER) as RedisBullQueueManger;
+            try {
+                const OCRInput = new OCRWorkerInput(url, lang, false, requestID);
+                const redisMsg: RedisRequestModel = {
+                    key: requestID,
+                    value: OCRInput
+                };
+                const queueName = env.redis.queuePrefix + lang;
+                const queueJob = await redisQueueWriter.sendMessage(queueName, redisMsg);
+                console.log(`Job added to queue [${queueName}] - jobId = `, queueJob?.id);
+                response.status(200).json({ id: requestID, ...request.body });
+            } catch (err) {
+                console.error("recognize POST error: [" + requestID + "]: " + err)
+                response.status(500).json({ error: GENERIC_ERROR });
+            }
+        })
+}
 
 /**
  * Ask for OCR recognition
