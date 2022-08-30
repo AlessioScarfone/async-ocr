@@ -1,18 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
 import compression from "compression";
 import cors from "cors";
-import morgan from "morgan";
 import { errorHandlerMiddleware } from "./middlewares/errorHandler.middleware";
 import * as Routers from "./routes";
 import requestIDMiddleware from "./middlewares/requestId.middleware";
-import loadMonitorPage from "./loaders/loadMonitorPage";
 import loadHelmetMiddleware from "./loaders/loadHelmetMiddleware";
 import loadBullMonitorPage from "./loaders/loadBullMonitorPage";
 import loadSwaggerPage from "./loaders/loadSwaggerPage";
 import env from "./config/env";
 import { rapidApiProxyCheckMiddleware } from "./middlewares/rapidApiProxyCheck.middleware";
-import RapidApiHeaders from "./models/RapidApiHeaders";
 import loadMorganLogger from "./loaders/loadMorganLogger";
 
 let bullMonitorConfiguredEsit = false;
@@ -27,7 +24,6 @@ const loadExpressMiddleware = (app: Express) => {
   loadHelmetMiddleware(app);
 
   //Admin Utils
-  loadMonitorPage(app)
   bullMonitorConfiguredEsit = loadBullMonitorPage(app);
   swaggerConfiguredEsit = loadSwaggerPage(app);
 
