@@ -37,10 +37,6 @@ const env = {
         queuePrefix: process.env.REDIS_QUEUE_RECOGNIZE || "recognize_",
         expiracy: toNumber(process.env.REDIS_EXPIRACY || "21600") 
     },
-    monitor: {
-        enabled: toBool(process.env.MONITOR_ENABLED),
-        page: process.env.MONITOR_ROUTE || "/admin/status",
-    },
     bullMonitor: {
         enabled: toBool(process.env.BULL_MONITOR_ENABLED),
         page: process.env.BULL_MONITOR_ROUTE || "/admin/bull",

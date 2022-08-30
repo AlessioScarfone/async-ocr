@@ -16,19 +16,6 @@ describe('Admin Router tests', () => {
         expect(response.body.message).toBe("ok");
     });
 
-    it('can open status page', async () => {
-        // console.log(env.monitor);
-        if (env.monitor.enabled && env.monitor.page) {
-            const response = await request(app)
-                .get(`${env.monitor.page}`)
-                .auth(env.admin.user, env.admin.password || "");
-
-            expect(response.statusCode).toBe(200);
-        } else {
-            console.log('TEST (can open status page): Status page not available');
-        }
-    })
-
     it('can open bull monitor page', async () => {
         // console.log(env.monitor);
         if (env.bullMonitor.enabled && env.bullMonitor.page) {

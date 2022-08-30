@@ -5,7 +5,6 @@ import cors from "cors";
 import { errorHandlerMiddleware } from "./middlewares/errorHandler.middleware";
 import * as Routers from "./routes";
 import requestIDMiddleware from "./middlewares/requestId.middleware";
-import loadMonitorPage from "./loaders/loadMonitorPage";
 import loadHelmetMiddleware from "./loaders/loadHelmetMiddleware";
 import loadBullMonitorPage from "./loaders/loadBullMonitorPage";
 import loadSwaggerPage from "./loaders/loadSwaggerPage";
@@ -25,7 +24,6 @@ const loadExpressMiddleware = (app: Express) => {
   loadHelmetMiddleware(app);
 
   //Admin Utils
-  loadMonitorPage(app)
   bullMonitorConfiguredEsit = loadBullMonitorPage(app);
   swaggerConfiguredEsit = loadSwaggerPage(app);
 
