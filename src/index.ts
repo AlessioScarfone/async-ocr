@@ -4,6 +4,7 @@ import createApp, { EXPRESS_CONTEXT_KEY } from "./app";
 import RedisClient from "./services/Redis/RedisClient";
 import RedisBullQueueManger from "./services/Redis/RedisBullQueueManager";
 import tesseractProcessorFactory from "./services/Tesseract/TesseractProcessor";
+import TesseractWorkerV2 from "./services/Tesseract/TesseractWorkerV2";
 
 const RECOGNIZE_QUEUE_ENG = env.redis.queuePrefix + "eng";
 
@@ -13,15 +14,17 @@ const bullQueueManger = RedisBullQueueManger.getInstance();
 bullQueueManger.createQueue(RECOGNIZE_QUEUE_ENG);
 
 const app = createApp();
+const workerV2_eng = new TesseractWorkerV2("eng");
 
 Promise.all([
     redisClient.connect(),
+    workerV2_eng.init(),
 ]).then(async () => {
-
+    
     // bullQueueManger.addProcessorOnQueue(RECOGNIZE_QUEUE_ENG,  (j,done) => {console.log("process", j.data); done()})
     bullQueueManger.addProcessorOnQueue(
         RECOGNIZE_QUEUE_ENG,
-        tesseractProcessorFactory(redisClient)
+        tesseractProcessorFactory(redisClient, workerV2_eng)
     )
 
     app.set(EXPRESS_CONTEXT_KEY.REDIS_QUEUE_MANAGER, bullQueueManger);
@@ -52,10 +55,11 @@ const addSIGTERMListener = (server: Server) => {
             Promise.all([
                 redisClient.disconnect(),
                 bullQueueManger.disconnect(),
+                workerV2_eng.destroy(),
             ]).then(() => {
                 console.log("SIGTERM END")
             }).catch(err => {
-                console.log("SIGTERM ERROR 1:", err);
+                console.log("SIGTERM ERROR:", err);
                 process.exit(1);
             })
         })

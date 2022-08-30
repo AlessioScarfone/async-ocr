@@ -5,11 +5,12 @@ import RedisClient from "../Redis/RedisClient";
 import TesseractWorker from "./TesseractWorker";
 import { OCRWorkerOutput } from "./OCRWorkerOutput";
 import { OCRWorkerInput } from "./OCRWorkerInput";
+import IWorker from "../../models/IWorker";
 
 const GENERIC_ERROR = "Generic error";
 
-const tesseractProcessorFactory = (redisClient: RedisClient): Queue.ProcessPromiseFunction<any> => {
-    const tesseractWorker: TesseractWorker = new TesseractWorker();
+const tesseractProcessorFactory = (redisClient: RedisClient, worker?: IWorker<OCRWorkerInput, OCRWorkerOutput>): Queue.ProcessPromiseFunction<any> => {
+    const tesseractWorker = worker || new TesseractWorker();
 
     return async (job: Job) => {
         const msg = job?.data as RedisRequestModel;
