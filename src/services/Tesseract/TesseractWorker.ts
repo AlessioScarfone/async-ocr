@@ -36,15 +36,19 @@ class TesseractWorker implements IWorker<OCRWorkerInput, OCRWorkerOutput> {
     }
 
     public async process(input: OCRWorkerInput) {
-        console.log("TesseractWorker#process Start:", { 
-            lang: input.lang, 
-            img: typeof input?.img === 'string' ? input?.img : '< Buffer >', 
-            isFile: input.isFile,
-            requestId: input.requestId
-        });
-        const timerId= "process time [" + input.lang + " - " + input.requestId + "]";
-        console.time(timerId)
+        if (env.log.tesseractCoreEnabled) {
+            console.log("TesseractWorker#process Start:", { 
+                lang: input.lang, 
+                img: typeof input?.img === 'string' ? input?.img : '< Buffer >', 
+                isFile: input.isFile,
+                requestId: input.requestId
+            });
+        }
+        
         if (input.img && input.lang) {
+            const timerId= "process time [" + input.lang + " - " + input.requestId + "]";
+            console.time(timerId)
+            
             // await this.init();
             // const ocrResult = await this.worker.recognize(input?.imgUrl);
             // const result: TesseractProcessorOutput = {
