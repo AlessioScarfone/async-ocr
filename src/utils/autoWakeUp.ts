@@ -9,8 +9,8 @@ const scheduleWakeUp = () => {
         const url = new URL(env.wakeUp.url);
         const client = (url.protocol == "https:") ? https : http
         setInterval(function() {
-            client.get(url, () => {
-                console.log("⏰ Wake Up ...");
+            client.get(url, (res) => {
+                console.log("⏰ Wake Up ...", {statusCode: res.statusCode});
             })
         }, time);
     }
