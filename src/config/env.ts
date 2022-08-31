@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import { SubscriptionPlan } from "../models/SubscriptionPlan";
+
 function toBool(value: string | undefined | null): boolean {
     return value === 'true';
 }
@@ -58,7 +60,8 @@ const env = {
         tesseractCoreEnabled: toBool(process.env.LOG_TESSERACT_CORE_ENABLED)
     },
     file: {
-        sizeLimit: toNumber(process.env.FILE_SIZE_LIMIT_BYTE ? process.env.FILE_SIZE_LIMIT_BYTE : "3000000")    //default 3MB
+        sizeLimit_basic: toNumber(process.env.FILE_SIZE_LIMIT_BYTE_BASIC ? process.env.FILE_SIZE_LIMIT_BYTE_BASIC : "1000000"),    //default 1MB
+        sizeLimit_pro: toNumber(process.env.FILE_SIZE_LIMIT_BYTE_PRO ? process.env.FILE_SIZE_LIMIT_BYTE_PRO : "3000000")    //default 3MB
     },
     wakeUp: {
         url: process.env.HEALTH_URL,
@@ -67,4 +70,11 @@ const env = {
     }
 }
 
+
+const fileSizeLimitMap = new Map();
+fileSizeLimitMap.set(SubscriptionPlan.BASIC,env.file.sizeLimit_basic);
+fileSizeLimitMap.set(SubscriptionPlan.PRO,env.file.sizeLimit_pro);
+//TODO: set other plan
+
 export default env;
+export { fileSizeLimitMap };
