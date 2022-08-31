@@ -35,7 +35,8 @@ const env = {
         // port: process.env.REDIS_PORT || "6379",
         // host: process.env.REDIS_HOST || "127.0.0.1",
         queuePrefix: process.env.REDIS_QUEUE_RECOGNIZE || "recognize_",
-        expiracy: toNumber(process.env.REDIS_EXPIRACY || "21600") 
+        /** ´REDIS_EXPIRACY´ or 21600 sec (6h) */
+        expiracy: toNumber(process.env.REDIS_EXPIRACY || "21600")
     },
     bullMonitor: {
         enabled: toBool(process.env.BULL_MONITOR_ENABLED),
@@ -58,6 +59,11 @@ const env = {
     },
     file: {
         sizeLimit: toNumber(process.env.FILE_SIZE_LIMIT_BYTE ? process.env.FILE_SIZE_LIMIT_BYTE : "3000000")    //default 3MB
+    },
+    wakeUp: {
+        url: process.env.HEALTH_URL,
+        /** `WAKE_UP_TIME` or 300000 ms (5min)*/
+        time: toNumber(process.env.WAKE_UP_TIME ? process.env.WAKE_UP_TIME : "300000")
     }
 }
 

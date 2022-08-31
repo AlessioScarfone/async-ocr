@@ -5,6 +5,7 @@ import RedisClient from "./services/Redis/RedisClient";
 import RedisBullQueueManger from "./services/Redis/RedisBullQueueManager";
 import tesseractProcessorFactory from "./services/Tesseract/TesseractProcessor";
 import TesseractWorkerV2 from "./services/Tesseract/TesseractWorkerV2";
+import startAutoWakeUp from "./utils/autoWakeUp";
 
 const RECOGNIZE_QUEUE_ENG = env.redis.queuePrefix + "eng";
 
@@ -36,6 +37,8 @@ Promise.all([
         () => {
             console.log(`🚀 Server ready at http://localhost:${env.port}`);
             console.log(`🗒 Node Env: ${env.node_env} \n`)
+
+            startAutoWakeUp();
         }
     );
 
