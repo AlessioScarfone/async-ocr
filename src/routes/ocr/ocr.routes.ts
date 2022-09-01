@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { body, check, query, validationResult } from "express-validator";
+import { body, check, oneOf, query, validationResult } from "express-validator";
 import { EXPRESS_CONTEXT_KEY } from "../../app";
 import env, { isProd } from "../../config/env";
 import RedisRequestModel from "../../models/RedisRequest.model";
@@ -146,5 +146,58 @@ ocrRouter.get(`${baseUrl}/recognition/result`,
             response.status(500).json({ error: 'Generic Error' });
         }
     })
+
+
+ocrRouter.get(`${baseUrl}/recognition/results`,
+    query('id')
+        .exists().bail().withMessage('Missing param')
+        .notEmpty().bail().withMessage('Empty id param'),
+    oneOf([
+        query('id').isString().withMessage('Invalid requestId list'),
+        query('id').isArray({ min: 2, max: 10 }).withMessage('Invalid requestId list (max lenght: 10)'),
+    ]),
+    async (request: Request, response: Response) => {
+        // ==== START: input validation ===
+        const errors = validationResult(request);
+        const requestID = request.requestID;
+        if (!errors.isEmpty()) {
+            console.log(`Error : [${requestID}]`, errors.array());
+            return response.status(400).json({ errors: errors.array() });
+        }
+        // ==== END: input validation ===
+        const idInput = request.query?.id;
+        let ids = new Set<string>();
+        if (Array.isArray(idInput)) {
+            ids = new Set<string>(idInput as Array<string>);
+        } else {
+            ids.add(String(idInput))
+        }
+
+        try {
+            const redisClient = request.app.get(EXPRESS_CONTEXT_KEY.REDIS_CLIENT) as RedisClient;
+            const result = []
+            for (const id of ids) {
+                const redisRecord = await redisClient.readMessage(id);
+                const ocrOutput = redisRecord ? JSON.parse(redisRecord) as OCRWorkerOutput : NOT_FOUND_ERROR;
+                result.push({
+                    id,
+                    ...ocrOutput
+                });
+            }
+
+            let statusCode = 404;
+            if (result.some(el => el?.error == undefined))
+                statusCode = 200;
+
+            return response.status(statusCode).json(result);
+        } catch (err) {
+            console.error("recognize GET error: [" + requestID + "]: " + err)
+            response.status(500).json({ error: 'Generic Error' });
+        }
+
+        return response.status(200).send(ids);
+    });
+
+
 
 export default ocrRouter;
