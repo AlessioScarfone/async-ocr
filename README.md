@@ -43,6 +43,9 @@ sequenceDiagram
 **GET** `/api/ocr/recognition/result`
 > Get result of text extraction
 
+**GET** `/api/ocr/recognition/results`
+> Get multiple results of text extractions in bulk
+
 ## Script
 
 - `start-dev` : run locally on development mode 
