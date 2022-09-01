@@ -9,9 +9,10 @@ export default function subscriptionPlanEndpointRestiction(
     return (request: Request, response: Response, next: NextFunction): void => {
         notAllowedPlan = notAllowedPlan.map(p => p.toUpperCase())
         const subscriptionPlanHeader = request.get(RapidApiHeaders.subscription)?.toUpperCase();
-        if (!subscriptionPlanHeader || notAllowedPlan.includes(subscriptionPlanHeader))
+        if (!subscriptionPlanHeader || notAllowedPlan.includes(subscriptionPlanHeader)){
+            console.log(`Subsciption plan endpoint restiction error - UserSubscription [${subscriptionPlanHeader}]`, "notAllowedPlan:", notAllowedPlan);
             response.status(403).json({ error: "Not allowed. Insufficient permissions" });
-        else {
+        } else {
             next();
         }
     }
