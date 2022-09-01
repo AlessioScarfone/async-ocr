@@ -8,9 +8,13 @@ const scheduleWakeUp = () => {
     if (env.wakeUp.url) {
         const url = new URL(env.wakeUp.url);
         const client = (url.protocol == "https:") ? https : http
-        setInterval(function() {
+        const intervalId = setInterval(function() {
             client.get(url, (res) => {
                 console.log("⏰ Wake Up ...", {statusCode: res.statusCode});
+                if(res.statusCode == 404) {
+                    clearInterval(intervalId);
+                    console.log("⏰ Url not found! Stop auto wake up")
+                }
             })
         }, time);
     }
