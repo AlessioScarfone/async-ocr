@@ -10,6 +10,8 @@ import { OCRWorkerOutput } from "../../services/Tesseract/OCRWorkerOutput";
 import multer from "multer";
 import { customValidatorFileSize, customValidatorMimeType } from "../../utils/validator";
 import { OCRWorkerInput } from "../../services/Tesseract/OCRWorkerInput";
+import subscriptionPlanEndpointRestiction from "../../middlewares/subscriptionPlanEndpointRestiction.middleware";
+import { SubscriptionPlan } from "../../models/SubscriptionPlan";
 
 const NOT_FOUND_ERROR: OCRWorkerOutput = { error: "NOT FOUND" };
 const GENERIC_ERROR = "GENERIC ERROR";
@@ -149,6 +151,7 @@ ocrRouter.get(`${baseUrl}/recognition/result`,
 
 
 ocrRouter.get(`${baseUrl}/recognition/results`,
+    subscriptionPlanEndpointRestiction([SubscriptionPlan.BASIC]),       //API blocked for BASIC plan
     query('id')
         .exists().bail().withMessage('Missing param')
         .notEmpty().bail().withMessage('Empty id param'),
