@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response, RequestHandler } from "express";
 import { nanoid } from 'nanoid';
+import RapidApiHeaders from "../models/RapidApiHeaders";
 
 /**
  * 
@@ -11,7 +12,7 @@ import { nanoid } from 'nanoid';
 export default function requestIDMiddleware(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     generator = (req: Request) => nanoid(),
-    headerName = 'X-Request-Id',
+    headerName = RapidApiHeaders.requestId,
     setHeader = true,
 ): RequestHandler {
     return (request: Request, response: Response, next: NextFunction) => {

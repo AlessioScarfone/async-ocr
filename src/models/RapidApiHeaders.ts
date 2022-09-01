@@ -8,4 +8,8 @@ export default class RapidApiHeaders {
     public static readonly subscription = "X-RapidAPI-Subscription";
     public static readonly versione = "X-RapidAPI-Version";
     public static readonly forwarded = "X-Forwarded-For";
+    public static readonly requestId = "X-Request-Id";
+    public static readonly ratelimitRequestsLimit = "x-ratelimit-requests-limit";
+    public static readonly ratelimitRequestsRemaining = "x-ratelimit-requests-remaining";
+    public static readonly ratelimitRequestsReset = "x-ratelimit-requests-reset";
 }
