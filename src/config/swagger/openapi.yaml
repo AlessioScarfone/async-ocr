@@ -1,10 +1,10 @@
 openapi: 3.0.3
 info:
-  title: Async Rest OCR
+  title: Async OCR
   description: Async REST OCR API
-  version: X.X.X
+  version: 1.0.0
 servers:
-  - url: http://localhost:8080/api
+  - url: https://async-ocr.onrender.com/api
 tags:
   - name: OCR Insert Request
     description: Insert text extraction request
@@ -46,7 +46,7 @@ paths:
     get:
       tags:
         - OCR Retrieve Result
-      summary: retrive text extraction result
+      summary: retrive text extraction result (single)
       parameters:
         - name: id
           in: query
@@ -66,9 +66,6 @@ paths:
                   value:
                     confidence: 98
                     text: lorem... ipsum..
-                fetch image error:
-                  value:
-                    error: 'reason: getaddrinfo ENOTFOUND mysite.com'
         '404':
           description: result found
           content:
@@ -79,6 +76,30 @@ paths:
                 not found error:
                   value:
                     error: NOT FOUND
+  /ocr/recognition/results:
+    get:
+      tags:
+        - OCR Retrieve Result
+      summary: retrive text extraction result (list)
+      parameters:
+        - name: id
+          in: query
+          description: List of request identifier
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          example: [kxSqOs359MEv0j73y42JR, gIezLJecBIMYM7nrlp03Y]
+      responses:
+        '200':
+          description: Result found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OCRWorkerOutputExtended'
+        '404':
+          description: No result found for all provided ids
 components:
   schemas:
     RecognizeResponse:
@@ -123,6 +144,11 @@ components:
           type: string
         error:
           type: string
-      example:
-        confidence: 98
-        text: lorem ipsum ...
+          description: any errors (Result Not Found)
+    OCRWorkerOutputExtended:
+      allOf:     # Combines the BasicErrorModel and the inline model
+        - $ref: '#/components/schemas/OCRWorkerOutput'
+        - properties:
+            id:
+              type: string
+    
