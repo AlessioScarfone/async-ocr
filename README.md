@@ -3,6 +3,14 @@
 Asynchronous REST OCR API
 </p>
 
+<br/>
+
+<p align="center">
+:warning:
+<b>This project is only a POC and it is not production ready or maintained</b>
+:warning:
+</p>
+
 ## Architecture
 - TypeScript + Express
 - Tesseract.js
